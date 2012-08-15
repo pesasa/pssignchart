@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sign chart</title>
+        <meta charset="UTF-8">
+        <link type="text/css" rel="stylesheet" media="all" href="style.css" />
+        <link type="text/css" rel="stylesheet" media="all" href="mathquill.css" />
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="mathquill.js"></script>
+        <script type="text/javascript" src="jquery.pssignchart.js"></script>
+        <script type="text/javascript">
+            jQuery(function(){
+                jQuery('.pssc1').pssignchart();
+                jQuery('.pssc1').pssignchart('add', {func: '2x-3', roots:[{label:'\\frac{3}{2}', value:1.5}]});
+                jQuery('.pssc1').pssignchart('add', {func: 'x^2', roots:[{label:'0', value:0}]});
+                jQuery('.pssc1').pssignchart('add', {func: 'x-2', roots: [2]});
+                jQuery('.pssc1').pssignchart('add', {func: 'x^2-1', roots: [-1, 1]});
+                jQuery('.pssc1').pssignchart('total', {func: '\\frac{\\left(x^2\\right)\\left(x-2\\right)}{x^2-1}'});
+            });
+        </script>
+    </head>
+    <body>
+<a href="https://github.com/pesasa/pssignchart"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>
+        <div class="content">
+            <h1>Pssignchart examples</h1>
+            <p>Here are couple of examples, how to use <code>pssignchart.js</code>.</p>
+<div class="codeexample">
+&lt;div class="pssc1"&gt;
+&lt;/div&gt;
+&lt;script type="text/javascript"&gt;
+    jQuery('.pssc1').psnumberline();
+    jQuery('.pssc1').pssignchart('add', {func: '2x-3', roots:[{label:'\\frac{3}{2}', value:1.5}]});
+    jQuery('.pssc1').pssignchart('add', {func: 'x^2', roots:[0]});
+    jQuery('.pssc1').pssignchart('add', {func: 'x-2', roots: [2]});
+    jQuery('.pssc1').pssignchart('add', {func: 'x^2-1', roots: [-1, 1]});
+    jQuery('.pssc1').pssignchart('total', {func: '\\frac{\\left(x^2\\right)\\left(x-2\\right)}{x^2-1}'});
+&lt;/script&gt;
+</div>
+            <div class="pssc1"></div>
+            <div class="pssc1" style="width: 500px;margin: 0 auto;"></div>
+        </div>
+    </body>
+</html>
