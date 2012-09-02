@@ -18,7 +18,7 @@ testilogit = {};
         // Test for numberline commands and trigger command with options.
         if (typeof(options) === 'string'){
             var cmd = options;
-            options = arguments[1];
+            options = arguments[1] || {};
             if (typeof(options) === 'string'){
                 options = {name: options};
             }
@@ -129,33 +129,45 @@ testilogit = {};
     }
     
     Pssignchart.prototype.addFunc = function(options){
+        // Add a new function on a new row.
         options = $.extend({
             func: '',
             roots: []
         }, options);
-        var row = new PsscRow(options);
-        this.rows.push(row);
         for (var i = 0; i < options.roots.length; i++){
+            var root = options.roots[i];
             if (typeof(options.roots[i]) === 'number'){
-                var root = new PsscRoot({label: ''+options.roots[i], value: options.roots[i]});
+                root = new PsscRoot({label: ''+options.roots[i], value: options.roots[i]});
             } else if (typeof(options.roots[i]) === 'object'
                          && typeof(options.roots[i].label) === 'string'
                          && typeof(options.roots[i].value) === 'number'){
-                var root = new PsscRoot({label: options.roots[i].label, value: options.roots[i].value});
+                root = new PsscRoot({label: options.roots[i].label, value: options.roots[i].value});
             }
+            options.roots[i] = root;
             if (!this.isInRoots(root)){
                 this.roots.push(root);
             };
         }
+        var row = new PsscRow(options);
+        this.rows.push(row);
         this.roots.sort(function(a,b){return (a.value < b.value ? -1 : 1)});
         this.draw();
         return this;
     }
     
     Pssignchart.prototype.addTotal = function(options){
-        this.total = [options];
+        this.total = [{func: options.func}];
         this.draw();
         return this;
+    }
+    
+    Pssignchart.prototype.getData = function(options){
+        var data = {rows: [], total: {func: "", signs: []}};
+        for (var i=0; i<this.rows.length; i++){
+            data.rows.push(this.rows[i].getData());
+        }
+        data.total.func = this.total[0].func;
+        options.result = data;
     }
     
     Pssignchart.prototype.initEvents = function(){
@@ -166,6 +178,10 @@ testilogit = {};
 
         this.place.bind('total', function(e, options){
             schart.addTotal(options);
+        });
+
+        this.place.bind('get', function(e, options){
+            return schart.getData(options);
         });
         return this;
     }
@@ -200,6 +216,8 @@ testilogit = {};
             roots: []
         }, options)
         this.func = options.func;
+        this.roots = options.roots;
+        /*
         this.roots = [];
         for (var i = 0; i < options.roots.length; i++){
             if (typeof(options.roots[i]) === 'number'){
@@ -210,11 +228,32 @@ testilogit = {};
                 this.roots.push(options.roots[i].value);
             }
         }
-        this.roots.sort();
+        */
+        this.roots.sort(function(a,b){return (a.value < b.value ? -1 : 1)});
     }
     
     PsscRow.prototype.getRoot = function(num){
         return this.roots[num];
+    }
+    
+    PsscRow.prototype.getRootVal = function(num){
+        return this.roots[num].val();
+    }
+    
+    PsscRow.prototype.getRootLabel = function(num){
+        return this.roots[num].getLabel();
+    }
+    
+    PsscRow.prototype.getRoots = function(){
+        return this.roots;
+    }
+    
+    PsscRow.prototype.getFunc = function(){
+        return this.func;
+    }
+    
+    PsscRow.prototype.getData = function(){
+        return jQuery.extend({},{func: this.func, roots: this.roots});
     }
     
     PsscRow.prototype.isRoot = function(num){
@@ -228,6 +267,14 @@ testilogit = {};
     
     PsscRoot.prototype.isEqual = function(other){
         return (this.value === other.value);
+    }
+    
+    PsscRoot.prototype.val = function(){
+        return this.value;
+    }
+    
+    PsscRoot.prototype.getLabel = function(){
+        return this.label;
     }
     
 })(jQuery)
