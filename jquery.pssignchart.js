@@ -44,7 +44,7 @@ testilogit = {};
     }
     
     Pssignchart = function(place, settings){
-        // Constructor for Psnumberline object.
+        // Constructor for Pssignchart object.
         this.settings = settings;
         this.place = $(place);
         this.place.addClass('pssignchart');
@@ -58,6 +58,7 @@ testilogit = {};
     }
     
     Pssignchart.prototype.init = function(){
+        // Init and draw the signchart
         var signchart = this;
         if (this.place.hasClass('pssc_rendered')){
             return false;
@@ -84,10 +85,10 @@ testilogit = {};
         $tbody.empty();
         for (var i = 0; i < this.rows.length; i++){
             var $trow = $('<tr></tr>');
-            $trow.append('<td><span class="mathquill pssc_func">'+this.rows[i].func+'</span></td>');
+            $trow.append('<td class="pssc_func"><span class="mathquill">'+this.rows[i].func+'</span></td><td class="pssc_motivation"></td>');
             for (var j = 0; j < this.roots.length; j++){
                 var $tdata = $('<td></td>');
-                if (this.rows[i].isRoot(this.roots[j].value)){
+                if (this.rows[i].isRoot(this.roots[j])){
                     $tdata.addClass('pssc_isroot');
                 }
                 $trow.append($tdata);
@@ -97,7 +98,7 @@ testilogit = {};
         }
         for (var i = 0; i < this.total.length; i++){
             var $trow = $('<tr class="pssc_total"></tr>');
-            $trow.append('<td class="pssc_total"><span class="mathquill">'+this.total[i].func+'</span></td>');
+            $trow.append('<td colspan="2" class="pssc_total"><span class="mathquill">'+this.total[i].func+'</span></td>');
             for (var j = 0; j < this.roots.length; j++){
                 $trow.append('<td></td>');
             }
@@ -108,13 +109,20 @@ testilogit = {};
         var $schart = this.place.find('.pssc_tablewrapper');
         $schart.find('.pssc_rootlabel').remove();
         var $tdelem = $tbody.find('tr:eq(0) td:eq(0)');
-        var xpos = $tdelem.outerWidth();
+        var xpos = $tdelem.outerWidth() + $tdelem.next().outerWidth();
         for (var i = 0; i < this.roots.length; i++){
             $tdelem = $tdelem.next('td');
             xpos = xpos + $tdelem.outerWidth();
             $schart.append('<div class="pssc_rootlabel" style="left:'+xpos+'px;"><span class="mathquill">'+this.roots[i].label+'</span></div>');
         }
         this.place.find('.mathquill:not(.mathquill-rendered-math)').mathquill();
+        
+        $tbody.find('td.pssc_motivation').click(function(){
+            var $tdmot = $(this);
+            var rownum = $tdmot.parents('tbody').find('tr').index($tdmot.parents('tr').eq(0));
+            var newmot = signchart.rows[rownum].nextMot();
+            $tdmot.attr('mot', Pssignchart.mot[newmot]);
+        });
     }
     
     Pssignchart.prototype.isInRoots = function(root){
@@ -186,7 +194,17 @@ testilogit = {};
         return this;
     }
     
-        
+    Pssignchart.mot = [
+        '',
+        'linear-asc',
+        'linear-desc',
+        'parab-up-0',
+        'parab-up-1',
+        'parab-up-2',
+        'parab-down-0',
+        'parab-down-1',
+        'parab-down-2'
+    ]
     
     Pssignchart.strings = {
         style: '.pssc_default {min-height: 2em; background-color: white; padding: 15px; border: 1px solid black; border-radius: 15px; box-shadow: 5px 5px 5px rgba(0,0,0,0.5); margin: 1em 0; text-align: center;'
@@ -206,29 +224,29 @@ testilogit = {};
             +'.pssc_rootlabel > span.mathquill {display: inline-block; position: relative; left: -50%; margin-top: -1em; vertical-align: middle;}'
             +'table.pssc_table td.pssc_isroot {border-right: 2px solid black;}'
             +'table.pssc_table td {min-width: 3em; border-right: 1px dotted black; padding: 0;}'
-            +'table.pssc_table td:first-child {padding: 0 1em; border-right: 1px solid black;}'
+            +'table.pssc_table td.pssc_func {padding: 0 1em; border-right: none;}'
+            +'table.pssc_table td.pssc_motivation {padding: 0 1em; border-right: 1px solid black; cursor: pointer; width: 30px; min-height: 20px; padding: 0;}'
+            +'table.pssc_table td.pssc_total {padding: 0 1em; border-right: 1px solid black;}'
+            +'table.pssc_table td.pssc_motivation[mot="linear-asc"] {background-image: url(images/linear-asc.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="linear-desc"] {background-image: url(images/linear-desc.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-up-0"] {background-image: url(images/parab-up-0.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-up-1"] {background-image: url(images/parab-up-1.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-up-2"] {background-image: url(images/parab-up-2.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-down-0"] {background-image: url(images/parab-down-0.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-down-1"] {background-image: url(images/parab-down-1.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-down-2"] {background-image: url(images/parab-down-2.png); background-position: center center; background-repeat: no-repeat;}'
     }
     
     
     PsscRow = function(options){
         options = $.extend({
             func: '',
-            roots: []
+            roots: [],
+            motivation: 0
         }, options)
         this.func = options.func;
         this.roots = options.roots;
-        /*
-        this.roots = [];
-        for (var i = 0; i < options.roots.length; i++){
-            if (typeof(options.roots[i]) === 'number'){
-                this.roots.push(options.roots[i]);
-            } else if (typeof(options.roots[i]) === 'object'
-                         && typeof(options.roots[i].label) === 'string'
-                         && typeof(options.roots[i].value) === 'number'){
-                this.roots.push(options.roots[i].value);
-            }
-        }
-        */
+        this.motivation = options.motivation;
         this.roots.sort(function(a,b){return (a.value < b.value ? -1 : 1)});
     }
     
@@ -256,10 +274,24 @@ testilogit = {};
         return jQuery.extend({},{func: this.func, roots: this.roots});
     }
     
-    PsscRow.prototype.isRoot = function(num){
-        return (this.roots.indexOf(num) > -1);
+    PsscRow.prototype.isRoot = function(root){
+        var isroot = false;
+        for (var i = 0; i < this.roots.length; i++){
+            isroot = this.roots[i].val() == root.val();
+            if (isroot){
+                break;
+            }
+        }
+        return isroot;
     }
     
+    PsscRow.prototype.nextMot = function(){
+        this.motivation = ((this.motivation + 1) % Pssignchart.mot.length)
+        return this.motivation;
+    }
+    
+
+
     PsscRoot = function(options){
         this.label = options.label;
         this.value = options.value;
