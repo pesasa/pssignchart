@@ -48,16 +48,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="4.2190705"
-     inkscape:cx="113.31111"
-     inkscape:cy="659.29592"
+     inkscape:cx="141.75339"
+     inkscape:cy="621.37288"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      gridtolerance="10"
      inkscape:window-width="1920"
-     inkscape:window-height="1121"
-     inkscape:window-x="-2"
-     inkscape:window-y="-3"
+     inkscape:window-height="1114"
+     inkscape:window-x="-8"
+     inkscape:window-y="-4"
      inkscape:window-maximized="1">
     <inkscape:grid
        type="xygrid"
@@ -423,6 +423,335 @@
          id="path3920"
          d="m 164.69295,466.84262 a 0.58004475,0.58004475 0 0 0 0.12019,1.15384 l 3.84616,0 a 0.57698069,0.57698069 0 1 0 0,-1.15384 l -3.84616,0 a 0.57698069,0.57698069 0 0 0 -0.12019,0 z"
          style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans" />
+    </g>
+    <path
+       sodipodi:nodetypes="sssssssss"
+       inkscape:connector-curvature="0"
+       id="use3047"
+       d="m 242.17877,492.36218 25.64246,0 c 1.20704,0 2.17877,0.97173 2.17877,2.17877 l 0,15.64246 c 0,1.20704 -0.97173,2.17877 -2.17877,2.17877 l -25.64246,0 c -1.20704,0 -2.17877,-0.97173 -2.17877,-2.17877 l 0,-15.64246 c 0,-1.20704 0.97173,-2.17877 2.17877,-2.17877 z"
+       style="fill:none;fill-opacity:1;stroke:none" />
+    <path
+       sodipodi:nodetypes="sssssssss"
+       inkscape:connector-curvature="0"
+       id="use3049"
+       d="m 272.17877,492.36218 25.64246,0 c 1.20704,0 2.17877,0.97173 2.17877,2.17877 l 0,15.64246 c 0,1.20704 -0.97173,2.17877 -2.17877,2.17877 l -25.64246,0 c -1.20704,0 -2.17877,-0.97173 -2.17877,-2.17877 l 0,-15.64246 c 0,-1.20704 0.97173,-2.17877 2.17877,-2.17877 z"
+       style="fill:none;fill-opacity:1;stroke:none" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#path3804"
+       id="use3051"
+       transform="translate(240,40)"
+       width="600"
+       height="600" />
+    <use
+       height="600"
+       width="600"
+       transform="translate(270,40)"
+       id="use3053"
+       xlink:href="#path3804"
+       y="0"
+       x="0" />
+    <g
+       transform="translate(20,40)"
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:label="#g4048"
+       id="g3055"
+       inkscape:export-filename="/home/pesasa/gitrepos/github/pssignchart/images/parab-up-0.png">
+      <path
+         sodipodi:nodetypes="sssssssss"
+         inkscape:connector-curvature="0"
+         id="use3057"
+         d="m 42.178771,452.36218 25.642458,0 c 1.207039,0 2.178771,0.97173 2.178771,2.17877 l 0,15.64246 c 0,1.20704 -0.971732,2.17877 -2.178771,2.17877 l -25.642458,0 C 40.971732,472.36218 40,471.39045 40,470.18341 l 0,-15.64246 c 0,-1.20704 0.971732,-2.17877 2.178771,-2.17877 z"
+         style="fill:none;fill-opacity:1;stroke:none" />
+      <use
+         height="600"
+         width="600"
+         transform="translate(40,4.91061)"
+         id="use3059"
+         xlink:href="#path3804"
+         y="0"
+         x="0" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 46.571864,454.28397 c 0,0 2.601998,10 8.428136,10 5.826138,0 8.428136,-10 8.428136,-10"
+         id="path3061"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="czc" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3063"
+         d="m 54.947614,454.90667 a 0.57698069,0.57698069 0 0 0 -0.120193,0.024 0.57698069,0.57698069 0 0 0 -0.45673,0.57692 l 0,1.34615 -1.346155,0 a 0.57698069,0.57698069 0 0 0 -0.120192,0 0.58004654,0.58004654 0 1 0 0.120192,1.15385 l 1.346155,0 0,1.34615 a 0.57698069,0.57698069 0 1 0 1.153845,0 l 0,-1.34615 1.346154,0 a 0.57698069,0.57698069 0 1 0 0,-1.15385 l -1.346154,0 0,-1.34615 a 0.57698069,0.57698069 0 0 0 -0.576922,-0.60096 z"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#d40000;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans" />
+    </g>
+    <g
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:label="#g4034"
+       id="g3065"
+       transform="translate(0,40)"
+       inkscape:export-filename="/home/pesasa/gitrepos/github/pssignchart/images/linear-desc.png">
+      <path
+         sodipodi:nodetypes="sssssssss"
+         inkscape:connector-curvature="0"
+         id="path3067"
+         d="M 2.178771,0 27.821229,0 C 29.028268,0 30,0.97173187 30,2.178771 l 0,15.642458 C 30,19.028268 29.028268,20 27.821229,20 L 2.178771,20 C 0.97173187,20 0,19.028268 0,17.821229 L 0,2.178771 C 0,0.97173187 0.97173187,0 2.178771,0 z"
+         style="fill:none;fill-opacity:1;stroke:none"
+         transform="translate(0,452.36218)" />
+      <path
+         sodipodi:nodetypes="cc"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:square;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 1.0614525,462.36218 27.7932965,0"
+         id="path3069"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1"
+         d="M 6.5718639,453.93404 23.428136,470.79032"
+         id="path3071"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3073"
+         d="m 5.0146495,454.99047 a 0.57698069,0.57698069 0 0 0 -0.120193,0.024 0.57698069,0.57698069 0 0 0 -0.45673,0.57692 l 0,1.34615 -1.346155,0 a 0.57698069,0.57698069 0 0 0 -0.1201919,0 0.58004653,0.58004653 0 0 0 0.1201919,1.15385 l 1.346155,0 0,1.34615 a 0.57698069,0.57698069 0 1 0 1.153845,0 l 0,-1.34615 1.346154,0 a 0.57698069,0.57698069 0 1 0 0,-1.15385 l -1.346154,0 0,-1.34615 a 0.57698069,0.57698069 0 0 0 -0.576922,-0.60096 z"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#d40000;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3075"
+         d="m 22.938725,465.95438 a 0.58004654,0.58004654 0 1 0 0.120192,1.15385 l 3.846153,0 a 0.57698069,0.57698069 0 1 0 0,-1.15385 l -3.846153,0 a 0.57698069,0.57698069 0 0 0 -0.120192,0 z"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans" />
+    </g>
+    <g
+       transform="translate(10,40)"
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:label="#g4041"
+       id="g3077"
+       inkscape:export-filename="/home/pesasa/gitrepos/github/pssignchart/images/linear-asc.png">
+      <path
+         sodipodi:nodetypes="sssssssss"
+         inkscape:connector-curvature="0"
+         id="use3079"
+         d="m 22.178771,452.36218 25.642458,0 c 1.207039,0 2.178771,0.97173 2.178771,2.17877 l 0,15.64246 c 0,1.20704 -0.971732,2.17877 -2.178771,2.17877 l -25.642458,0 C 20.971732,472.36218 20,471.39045 20,470.18341 l 0,-15.64246 c 0,-1.20704 0.971732,-2.17877 2.178771,-2.17877 z"
+         style="fill:none;fill-opacity:1;stroke:none" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#path3804"
+         id="use3081"
+         transform="translate(20,0)"
+         width="600"
+         height="600" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3083"
+         d="M 26.571864,470.79032 43.428136,453.93404"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#d40000;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+         d="m 45.020237,454.90667 a 0.57698069,0.57698069 0 0 0 -0.120193,0.024 0.57698069,0.57698069 0 0 0 -0.45673,0.57692 l 0,1.34615 -1.346155,0 a 0.57698069,0.57698069 0 0 0 -0.120192,0 0.58004654,0.58004654 0 1 0 0.120192,1.15385 l 1.346155,0 0,1.34615 a 0.57698069,0.57698069 0 1 0 1.153845,0 l 0,-1.34615 1.346154,0 a 0.57698069,0.57698069 0 1 0 0,-1.15385 l -1.346154,0 0,-1.34615 a 0.57698069,0.57698069 0 0 0 -0.576922,-0.60096 z"
+         id="path3085"
+         inkscape:connector-curvature="0" />
+      <path
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+         d="m 22.838162,465.87058 a 0.58004654,0.58004654 0 1 0 0.120192,1.15385 l 3.846153,0 a 0.57698069,0.57698069 0 1 0 0,-1.15385 l -3.846153,0 a 0.57698069,0.57698069 0 0 0 -0.120192,0 z"
+         id="path3087"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       transform="translate(30,40)"
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:label="#g4054"
+       id="g3089"
+       inkscape:export-filename="/home/pesasa/gitrepos/github/pssignchart/images/parab-down-0.png">
+      <path
+         sodipodi:nodetypes="sssssssss"
+         inkscape:connector-curvature="0"
+         id="use3091"
+         d="m 62.178771,452.36218 25.642458,0 c 1.207039,0 2.178771,0.97173 2.178771,2.17877 l 0,15.64246 c 0,1.20704 -0.971732,2.17877 -2.178771,2.17877 l -25.642458,0 C 60.971732,472.36218 60,471.39045 60,470.18341 l 0,-15.64246 c 0,-1.20704 0.971732,-2.17877 2.178771,-2.17877 z"
+         style="fill:none;fill-opacity:1;stroke:none" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#path3804"
+         id="use3093"
+         transform="translate(60,-5.00559)"
+         width="600"
+         height="600" />
+      <path
+         sodipodi:nodetypes="czc"
+         inkscape:connector-curvature="0"
+         id="path3095"
+         d="m 66.571864,470.45157 c 0,0 2.601998,-10 8.428136,-10 5.826138,0 8.428136,10 8.428136,10"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3097"
+         d="m 72.933137,465.95438 a 0.58004654,0.58004654 0 1 0 0.120192,1.15385 l 3.846153,0 a 0.57698069,0.57698069 0 1 0 0,-1.15385 l -3.846153,0 a 0.57698069,0.57698069 0 0 0 -0.120192,0 z"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans" />
+    </g>
+    <g
+       transform="translate(40,40)"
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:label="#g4060"
+       id="g3099"
+       inkscape:export-filename="/home/pesasa/gitrepos/github/pssignchart/images/parab-up-1.png">
+      <path
+         sodipodi:nodetypes="sssssssss"
+         inkscape:connector-curvature="0"
+         id="use3101"
+         d="m 82.178771,452.36218 25.642459,0 c 1.20704,0 2.17877,0.97173 2.17877,2.17877 l 0,15.64246 c 0,1.20704 -0.97173,2.17877 -2.17877,2.17877 l -25.642459,0 C 80.971732,472.36218 80,471.39045 80,470.18341 l 0,-15.64246 c 0,-1.20704 0.971732,-2.17877 2.178771,-2.17877 z"
+         style="fill:none;fill-opacity:1;stroke:none" />
+      <use
+         height="600"
+         width="600"
+         transform="translate(80,2)"
+         id="use3103"
+         xlink:href="#path3804"
+         y="0"
+         x="0" />
+      <path
+         sodipodi:nodetypes="czc"
+         inkscape:connector-curvature="0"
+         id="path3105"
+         d="m 86.571864,454.28397 c 0,0 2.601998,10 8.428136,10 5.82614,0 8.42814,-10 8.42814,-10"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#d40000;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+         d="m 85.042589,457.40947 a 0.57698069,0.57698069 0 0 0 -0.120193,0.024 0.57698069,0.57698069 0 0 0 -0.45673,0.57692 l 0,1.34615 -1.346155,0 a 0.57698069,0.57698069 0 0 0 -0.120192,0 0.58004654,0.58004654 0 1 0 0.120192,1.15385 l 1.346155,0 0,1.34615 a 0.57698069,0.57698069 0 1 0 1.153845,0 l 0,-1.34615 1.346154,0 a 0.57698069,0.57698069 0 1 0 0,-1.15385 l -1.346154,0 0,-1.34615 a 0.57698069,0.57698069 0 0 0 -0.576922,-0.60096 z"
+         id="path3107"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3109"
+         d="m 105.11522,457.40947 a 0.57698069,0.57698069 0 0 0 -0.1202,0.024 0.57698069,0.57698069 0 0 0 -0.45673,0.57692 l 0,1.34615 -1.34615,0 a 0.57698069,0.57698069 0 0 0 -0.12019,0 0.58004643,0.58004643 0 1 0 0.12019,1.15385 l 1.34615,0 0,1.34615 a 0.57698069,0.57698069 0 1 0 1.15385,0 l 0,-1.34615 1.34615,0 a 0.57698069,0.57698069 0 1 0 0,-1.15385 l -1.34615,0 0,-1.34615 a 0.57698069,0.57698069 0 0 0 -0.57692,-0.60096 z"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#d40000;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans" />
+    </g>
+    <g
+       transform="translate(50,40)"
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:label="#g4067"
+       id="g3111"
+       inkscape:export-filename="/home/pesasa/gitrepos/github/pssignchart/images/parab-down-1.png">
+      <path
+         sodipodi:nodetypes="sssssssss"
+         inkscape:connector-curvature="0"
+         id="use3113"
+         d="m 102.17877,452.36218 25.64246,0 c 1.20704,0 2.17877,0.97173 2.17877,2.17877 l 0,15.64246 c 0,1.20704 -0.97173,2.17877 -2.17877,2.17877 l -25.64246,0 c -1.20704,0 -2.17877,-0.97173 -2.17877,-2.17877 l 0,-15.64246 c 0,-1.20704 0.97173,-2.17877 2.17877,-2.17877 z"
+         style="fill:none;fill-opacity:1;stroke:none" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#path3804"
+         id="use3115"
+         transform="translate(100,-2)"
+         width="600"
+         height="600" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 106.57186,470.45157 c 0,0 2.602,-10 8.42814,-10 5.82614,0 8.42814,10 8.42814,10"
+         id="path3117"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="czc" />
+      <path
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+         d="m 102.94435,464.94878 a 0.58004643,0.58004643 0 0 0 0.12019,1.15385 l 3.84616,0 a 0.57698069,0.57698069 0 1 0 0,-1.15385 l -3.84616,0 a 0.57698069,0.57698069 0 0 0 -0.12019,0 z"
+         id="path3119"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3121"
+         d="m 122.93315,464.94878 a 0.58004643,0.58004643 0 0 0 0.12019,1.15385 l 3.84616,0 a 0.57698069,0.57698069 0 1 0 0,-1.15385 l -3.84616,0 a 0.57698069,0.57698069 0 0 0 -0.12019,0 z"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans" />
+    </g>
+    <g
+       transform="translate(60,40)"
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:label="#g4074"
+       id="g3123"
+       inkscape:export-filename="/home/pesasa/gitrepos/github/pssignchart/images/parab-up-2.png">
+      <path
+         sodipodi:nodetypes="sssssssss"
+         inkscape:connector-curvature="0"
+         id="use3125"
+         d="m 122.17877,452.36218 25.64246,0 c 1.20704,0 2.17877,0.97173 2.17877,2.17877 l 0,15.64246 c 0,1.20704 -0.97173,2.17877 -2.17877,2.17877 l -25.64246,0 c -1.20704,0 -2.17877,-0.97173 -2.17877,-2.17877 l 0,-15.64246 c 0,-1.20704 0.97173,-2.17877 2.17877,-2.17877 z"
+         style="fill:none;fill-opacity:1;stroke:none" />
+      <use
+         height="600"
+         width="600"
+         transform="translate(120,0)"
+         id="use3127"
+         xlink:href="#path3804"
+         y="0"
+         x="0" />
+      <path
+         sodipodi:nodetypes="czc"
+         inkscape:connector-curvature="0"
+         id="path3129"
+         d="m 126.57186,454.28397 c 0,0 2.602,16 8.42814,16 5.82614,0 8.42814,-16 8.42814,-16"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+         d="m 132.87175,465.0214 a 0.58004475,0.58004475 0 0 0 0.12019,1.15384 l 3.84616,0 a 0.57698069,0.57698069 0 1 0 0,-1.15384 l -3.84616,0 a 0.57698069,0.57698069 0 0 0 -0.12019,0 z"
+         id="path3131"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3133"
+         d="m 123.45042,454.91786 a 0.57698069,0.57698069 0 0 0 -0.1202,0.024 0.57698069,0.57698069 0 0 0 -0.45673,0.57693 l 0,1.34615 -1.34615,0 a 0.57698069,0.57698069 0 0 0 -0.12019,0 0.58004643,0.58004643 0 1 0 0.12019,1.15385 l 1.34615,0 0,1.34615 a 0.57698069,0.57698069 0 1 0 1.15385,0 l 0,-1.34615 1.34615,0 a 0.57698069,0.57698069 0 1 0 0,-1.15385 l -1.34615,0 0,-1.34615 a 0.57698069,0.57698069 0 0 0 -0.57692,-0.60096 z"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#d40000;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans" />
+      <path
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#d40000;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+         d="m 146.58462,454.91787 a 0.57698069,0.57698069 0 0 0 -0.1202,0.024 0.57698069,0.57698069 0 0 0 -0.45673,0.57692 l 0,1.34615 -1.34615,0 a 0.57698069,0.57698069 0 0 0 -0.12019,0 0.58004643,0.58004643 0 0 0 0.12019,1.15385 l 1.34615,0 0,1.34615 a 0.57698069,0.57698069 0 1 0 1.15385,0 l 0,-1.34615 1.34615,0 a 0.57698069,0.57698069 0 1 0 0,-1.15385 l -1.34615,0 0,-1.34615 a 0.57698069,0.57698069 0 0 0 -0.57692,-0.60096 z"
+         id="path3135"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       transform="translate(70,40)"
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:label="#g4082"
+       id="g3137"
+       inkscape:export-filename="/home/pesasa/gitrepos/github/pssignchart/images/parab-down-2.png">
+      <path
+         sodipodi:nodetypes="sssssssss"
+         inkscape:connector-curvature="0"
+         id="use3139"
+         d="m 142.17877,452.36218 25.64246,0 c 1.20704,0 2.17877,0.97173 2.17877,2.17877 l 0,15.64246 c 0,1.20704 -0.97173,2.17877 -2.17877,2.17877 l -25.64246,0 c -1.20704,0 -2.17877,-0.97173 -2.17877,-2.17877 l 0,-15.64246 c 0,-1.20704 0.97173,-2.17877 2.17877,-2.17877 z"
+         style="fill:none;fill-opacity:1;stroke:none" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#path3804"
+         id="use3141"
+         transform="translate(140,0)"
+         width="600"
+         height="600" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 146.57186,470.28397 c 0,0 2.602,-16 8.42814,-16 5.82614,0 8.42814,16 8.42814,16"
+         id="path3143"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="czc" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3145"
+         d="m 154.98122,456.16367 a 0.57698069,0.57698069 0 0 0 -0.1202,0.024 0.57698069,0.57698069 0 0 0 -0.45673,0.57693 l 0,1.34615 -1.34615,0 a 0.57698069,0.57698069 0 0 0 -0.12019,0 0.58004643,0.58004643 0 1 0 0.12019,1.15385 l 1.34615,0 0,1.34615 a 0.57698069,0.57698069 0 1 0 1.15385,0 l 0,-1.34615 1.34615,0 a 0.57698069,0.57698069 0 1 0 0,-1.15385 l -1.34615,0 0,-1.34615 a 0.57698069,0.57698069 0 0 0 -0.57692,-0.60096 z"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#d40000;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3147"
+         d="m 141.27955,466.75882 a 0.58004475,0.58004475 0 0 0 0.12019,1.15384 l 3.84616,0 a 0.57698069,0.57698069 0 1 0 0,-1.15384 l -3.84616,0 a 0.57698069,0.57698069 0 0 0 -0.12019,0 z"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans" />
+      <path
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+         d="m 164.69295,466.84262 a 0.58004475,0.58004475 0 0 0 0.12019,1.15384 l 3.84616,0 a 0.57698069,0.57698069 0 1 0 0,-1.15384 l -3.84616,0 a 0.57698069,0.57698069 0 0 0 -0.12019,0 z"
+         id="path3149"
+         inkscape:connector-curvature="0" />
     </g>
   </g>
 </svg>
