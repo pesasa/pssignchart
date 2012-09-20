@@ -22,6 +22,9 @@ testilogit = {};
             if (typeof(options) === 'string'){
                 options = {name: options};
             }
+            if (typeof(options) === 'undefined'){
+                options = {}
+            }
             // Placeholder variable for returning value.
             options.result = this;
             this.trigger(cmd, options);
@@ -85,24 +88,26 @@ testilogit = {};
         $tbody.empty();
         for (var i = 0; i < this.rows.length; i++){
             var $trow = $('<tr></tr>');
-            $trow.append('<td class="pssc_func"><span class="mathquill">'+this.rows[i].func+'</span></td><td class="pssc_motivation"></td>');
+            $trow.append('<td class="pssc_func"><span class="mathquill">'+this.rows[i].func
+                +'</span></td><td class="pssc_motivation" mot="'+Pssignchart.mot[this.getMot(i)]
+                +'"><a href="javascript:;"><span></span></a></td>');
             for (var j = 0; j < this.roots.length; j++){
-                var $tdata = $('<td></td>');
+                var $tdata = $('<td class="pssc_sign" sign="'+this.getSign(i, j)+'"></td>');
                 if (this.rows[i].isRoot(this.roots[j])){
                     $tdata.addClass('pssc_isroot');
                 }
                 $trow.append($tdata);
             }
-            $trow.append('<td></td>');
+            $trow.append('<td class="pssc_sign" sign="'+this.getSign(i, this.roots.length)+'"></td>');
             $tbody.append($trow);
         }
         for (var i = 0; i < this.total.length; i++){
             var $trow = $('<tr class="pssc_total"></tr>');
             $trow.append('<td colspan="2" class="pssc_total"><span class="mathquill">'+this.total[i].func+'</span></td>');
             for (var j = 0; j < this.roots.length; j++){
-                $trow.append('<td></td>');
+                $trow.append('<td class="pssc_sign" sign="'+this.getTotalSign(j)+'"></td>');
             }
-            $trow.append('<td></td>');
+            $trow.append('<td class="pssc_sign" sign="'+this.getTotalSign(this.roots.length)+'"></td>');
         }
         $tbody.append($trow);
         this.place.find('.mathquill').mathquill();
@@ -117,12 +122,47 @@ testilogit = {};
         }
         this.place.find('.mathquill:not(.mathquill-rendered-math)').mathquill();
         
-        $tbody.find('td.pssc_motivation').click(function(){
-            var $tdmot = $(this);
+        // Init clicks for motivations.
+        $tbody.find('td.pssc_motivation a').click(function(){
+            var $motlink = $(this);
+            var $tdmot = $motlink.parent('td');
             var rownum = $tdmot.parents('tbody').find('tr').index($tdmot.parents('tr').eq(0));
             var newmot = signchart.rows[rownum].nextMot();
             $tdmot.attr('mot', Pssignchart.mot[newmot]);
+            signchart.setMot(rownum, newmot);
         });
+        
+        // Init sign clicks for plus, minus and none.
+        $tbody.find('td.pssc_sign').click(function(){
+            var $td = $(this);
+            var rownum = $td.parents('tbody').find('tr').index($td.parents('tr').eq(0));
+            var colnum = $td.parents('tr').eq(0).find('td').index($td) - 2;
+            var istotal = $td.parents('tr').eq(0).hasClass('pssc_total');
+            if (istotal){
+                colnum += 1;
+            }
+            var sign = $td.attr('sign');
+            var newsign;
+            switch (sign){
+                case 'plus':
+                    newsign = 'minus';
+                    break;
+                case 'minus':
+                    newsign = '';
+                    break;
+                case '':
+                    newsign = 'plus';
+                    break;
+                default:
+                    newsign = '';
+            }
+            $td.attr('sign', newsign);
+            if (istotal){
+                signchart.setTotalSign(colnum, newsign);
+            } else {
+                signchart.setSign(rownum, colnum, newsign);
+            }
+        })
     }
     
     Pssignchart.prototype.isInRoots = function(root){
@@ -136,11 +176,12 @@ testilogit = {};
         return result;
     }
     
-    Pssignchart.prototype.addFunc = function(options){
+    Pssignchart.prototype.addFunc = function(options, nodraw){
         // Add a new function on a new row.
         options = $.extend({
             func: '',
-            roots: []
+            roots: [],
+            signs: []
         }, options);
         for (var i = 0; i < options.roots.length; i++){
             var root = options.roots[i];
@@ -159,14 +200,44 @@ testilogit = {};
         var row = new PsscRow(options);
         this.rows.push(row);
         this.roots.sort(function(a,b){return (a.value < b.value ? -1 : 1)});
-        this.draw();
+        if (!nodraw){
+            this.draw();
+        }
         return this;
     }
     
-    Pssignchart.prototype.addTotal = function(options){
-        this.total = [{func: options.func}];
-        this.draw();
+    Pssignchart.prototype.addTotal = function(options, nodraw){
+        options.func = options.func || '';
+        options.signs = options.signs || [];
+        this.total = [{func: options.func, signs: options.signs}];
+        if (!nodraw){
+            this.draw();
+        }
         return this;
+    }
+    
+    Pssignchart.prototype.setMot = function(row, mot){
+        this.rows[row].setMotivation(mot);
+    }
+    
+    Pssignchart.prototype.getMot = function(row){
+        return this.rows[row].getMotivation();
+    }
+    
+    Pssignchart.prototype.setSign = function(row, col, sign){
+        this.rows[row].setSign(col, sign);
+    }
+    
+    Pssignchart.prototype.getSign = function(row, col){
+        return this.rows[row].getSign(col);
+    }
+    
+    Pssignchart.prototype.setTotalSign = function(col, sign){
+        this.total[0].signs[col] = sign;
+    }
+    
+    Pssignchart.prototype.getTotalSign = function(col){
+        return this.total[0].signs[col];
     }
     
     Pssignchart.prototype.getData = function(options){
@@ -175,7 +246,23 @@ testilogit = {};
             data.rows.push(this.rows[i].getData());
         }
         data.total.func = this.total[0].func;
+        data.total.signs = this.total[0].signs;
         options.result = data;
+    }
+    
+    Pssignchart.prototype.setData = function(options){
+        this.empty();
+        for (var i = 0; i < options.rows.length; i++){
+            this.addFunc(options.rows[i], true);
+        }
+        this.addTotal(options.total, true);
+        this.draw();
+    }
+    
+    Pssignchart.prototype.empty = function(){
+        this.rows = [];
+        this.roots = [];
+        this.total = [];
     }
     
     Pssignchart.prototype.initEvents = function(){
@@ -191,6 +278,11 @@ testilogit = {};
         this.place.bind('get', function(e, options){
             return schart.getData(options);
         });
+        
+        this.place.bind('set', function(e, options){
+            schart.setData(options);
+        })
+        
         return this;
     }
     
@@ -207,34 +299,65 @@ testilogit = {};
     ]
     
     Pssignchart.strings = {
-        style: '.pssc_default {min-height: 2em; background-color: white; padding: 15px; border: 1px solid black; border-radius: 15px; box-shadow: 5px 5px 5px rgba(0,0,0,0.5); margin: 1em 0; text-align: center;'
-            + 'background: rgb(254,255,232); /* Old browsers */ background: -moz-linear-gradient(top,  rgba(254,255,232,1) 0%, rgba(214,219,191,1) 100%); /* FF3.6+ */'
-            +'background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(254,255,232,1)), color-stop(100%,rgba(214,219,191,1))); /* Chrome,Safari4+ */'
-            +'background: -webkit-linear-gradient(top,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* Chrome10+,Safari5.1+ */'
-            +'background: -o-linear-gradient(top,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* Opera 11.10+ */'
-            +'background: -ms-linear-gradient(top,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* IE10+ */'
-            +'background: linear-gradient(to bottom,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* W3C */'
-            +'filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#feffe8", endColorstr="#d6dbbf",GradientType=0 ); /* IE6-9 */}'
+        style:
+            '.pssc_default {min-height: 2em; background-color: white; padding: 15px; border: 1px solid black; border-radius: 15px; box-shadow: 5px 5px 5px rgba(0,0,0,0.5); margin: 1em 0; text-align: center;'
+                + 'background: rgb(254,255,232); /* Old browsers */ background: -moz-linear-gradient(top,  rgba(254,255,232,1) 0%, rgba(214,219,191,1) 100%); /* FF3.6+ */'
+                +'background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(254,255,232,1)), color-stop(100%,rgba(214,219,191,1))); /* Chrome,Safari4+ */'
+                +'background: -webkit-linear-gradient(top,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* Chrome10+,Safari5.1+ */'
+                +'background: -o-linear-gradient(top,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* Opera 11.10+ */'
+                +'background: -ms-linear-gradient(top,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* IE10+ */'
+                +'background: linear-gradient(to bottom,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* W3C */'
+                +'filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#feffe8", endColorstr="#d6dbbf",GradientType=0 ); /* IE6-9 */}'
             +'.pssc_default table.pssc_table {border-collapse: collapse; border: 1px solid black; margin: 0.2em auto;}'
-            +'table.pssc_table tr:nth-child(even) td {background-color: #dfb;}'
+            +'table.pssc_table tr:nth-child(even) td {background-color: #eef;/*#dfb;*/}'
             +'table.pssc_table tr:nth-child(odd) td {background-color: white;}'
-            +'table.pssc_table tr.pssc_total {border-top: 2px solid black;}'
+            +'table.pssc_table tr.pssc_total {border-top: 4px solid black;}'
             +'.pssc_tablewrapper {margin: 0 auto; padding-top: 1.5em; position: relative; display: inline-block; text-align: left;}'
             +'.pssc_rootlabel {position: absolute; top: 0; width: auto; overflow: visible; text-align: center; height: 0.5em; white-space: nowrap;}'
             +'.pssc_rootlabel > span.mathquill {display: inline-block; position: relative; left: -50%; margin-top: -1em; vertical-align: middle;}'
             +'table.pssc_table td.pssc_isroot {border-right: 2px solid black;}'
             +'table.pssc_table td {min-width: 3em; border-right: 1px dotted black; padding: 0;}'
             +'table.pssc_table td.pssc_func {padding: 0 1em; border-right: none;}'
-            +'table.pssc_table td.pssc_motivation {padding: 0 1em; border-right: 1px solid black; cursor: pointer; width: 30px; min-height: 20px; padding: 0;}'
+            +'table.pssc_table td.pssc_motivation {padding: 0 1em; border-right: 1px solid black; cursor: pointer; padding: 0;}'
+            +'table.pssc_table td.pssc_motivation a span {width: 30px; height: 20px; display: block; margin: 0 auto;}'
+            +'table.pssc_table td.pssc_motivation a {text-align: center; display: block; border: 1px solid #777; border-radius: 4px; margin: 2px;}'
+            +'.pssc_default, table.pssc_table td.pssc_motivation a {'
+                +'background: rgb(255,255,255); /* Old browsers */'
+                +'background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%); /* FF3.6+ */'
+                +'background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(47%,rgba(246,246,246,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */'
+                +'background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(246,246,246,1) 47%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */'
+                +'background: -o-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(246,246,246,1) 47%,rgba(237,237,237,1) 100%); /* Opera 11.10+ */'
+                +'background: -ms-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(246,246,246,1) 47%,rgba(237,237,237,1) 100%); /* IE10+ */'
+                +'background: linear-gradient(to bottom,  rgba(255,255,255,1) 0%,rgba(246,246,246,1) 47%,rgba(237,237,237,1) 100%); /* W3C */'
+                +'filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#ffffff", endColorstr="#ededed",GradientType=0 ); /* IE6-9 */}'
             +'table.pssc_table td.pssc_total {padding: 0 1em; border-right: 1px solid black;}'
-            +'table.pssc_table td.pssc_motivation[mot="linear-asc"] {background-image: url(images/linear-asc.png); background-position: center center; background-repeat: no-repeat;}'
-            +'table.pssc_table td.pssc_motivation[mot="linear-desc"] {background-image: url(images/linear-desc.png); background-position: center center; background-repeat: no-repeat;}'
-            +'table.pssc_table td.pssc_motivation[mot="parab-up-0"] {background-image: url(images/parab-up-0.png); background-position: center center; background-repeat: no-repeat;}'
-            +'table.pssc_table td.pssc_motivation[mot="parab-up-1"] {background-image: url(images/parab-up-1.png); background-position: center center; background-repeat: no-repeat;}'
-            +'table.pssc_table td.pssc_motivation[mot="parab-up-2"] {background-image: url(images/parab-up-2.png); background-position: center center; background-repeat: no-repeat;}'
-            +'table.pssc_table td.pssc_motivation[mot="parab-down-0"] {background-image: url(images/parab-down-0.png); background-position: center center; background-repeat: no-repeat;}'
-            +'table.pssc_table td.pssc_motivation[mot="parab-down-1"] {background-image: url(images/parab-down-1.png); background-position: center center; background-repeat: no-repeat;}'
-            +'table.pssc_table td.pssc_motivation[mot="parab-down-2"] {background-image: url(images/parab-down-2.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="linear-asc"] span {background-image: url(images/linear-asc.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="linear-desc"] span {background-image: url(images/linear-desc.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-up-0"] span {background-image: url(images/parab-up-0.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-up-1"] span {background-image: url(images/parab-up-1.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-up-2"] span {background-image: url(images/parab-up-2.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-down-0"] span {background-image: url(images/parab-down-0.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-down-1"] span {background-image: url(images/parab-down-1.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-down-2"] span {background-image: url(images/parab-down-2.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_sign {cursor: pointer;}'
+            +'table.pssc_table td.pssc_sign[sign="plus"]::before {content: "+"; font-weight: bold; display: block; text-align: center; color: white; text-shadow: 0 0 1px black;}'
+            +'table.pssc_table td.pssc_sign[sign="plus"] {background: rgb(248,80,50); /* Old browsers */'
+                +'background: -moz-linear-gradient(top,  rgba(248,80,50,1) 0%, rgba(241,111,92,1) 50%, rgba(246,41,12,1) 51%, rgba(240,47,23,1) 71%, rgba(231,56,39,1) 100%); /* FF3.6+ */'
+                +'background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(248,80,50,1)), color-stop(50%,rgba(241,111,92,1)), color-stop(51%,rgba(246,41,12,1)), color-stop(71%,rgba(240,47,23,1)), color-stop(100%,rgba(231,56,39,1))); /* Chrome,Safari4+ */'
+                +'background: -webkit-linear-gradient(top,  rgba(248,80,50,1) 0%,rgba(241,111,92,1) 50%,rgba(246,41,12,1) 51%,rgba(240,47,23,1) 71%,rgba(231,56,39,1) 100%); /* Chrome10+,Safari5.1+ */'
+                +'background: -o-linear-gradient(top,  rgba(248,80,50,1) 0%,rgba(241,111,92,1) 50%,rgba(246,41,12,1) 51%,rgba(240,47,23,1) 71%,rgba(231,56,39,1) 100%); /* Opera 11.10+ */'
+                +'background: -ms-linear-gradient(top,  rgba(248,80,50,1) 0%,rgba(241,111,92,1) 50%,rgba(246,41,12,1) 51%,rgba(240,47,23,1) 71%,rgba(231,56,39,1) 100%); /* IE10+ */'
+                +'background: linear-gradient(to bottom,  rgba(248,80,50,1) 0%,rgba(241,111,92,1) 50%,rgba(246,41,12,1) 51%,rgba(240,47,23,1) 71%,rgba(231,56,39,1) 100%); /* W3C */'
+                +'filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#f85032", endColorstr="#e73827",GradientType=0 ); /* IE6-9 */}'
+            +'table.pssc_table td.pssc_sign[sign="minus"]::before {content: "\u2014"; font-weight: bold; display: block; text-align: center; color: white; text-shadow: 0 0 1px black;}'
+            +'table.pssc_table td.pssc_sign[sign="minus"] {background: rgb(183,222,237); /* Old browsers */'
+                +'background: -moz-linear-gradient(top,  rgba(183,222,237,1) 0%, rgba(113,206,239,1) 50%, rgba(33,180,226,1) 51%, rgba(183,222,237,1) 100%); /* FF3.6+ */'
+                +'background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(183,222,237,1)), color-stop(50%,rgba(113,206,239,1)), color-stop(51%,rgba(33,180,226,1)), color-stop(100%,rgba(183,222,237,1))); /* Chrome,Safari4+ */'
+                +'background: -webkit-linear-gradient(top,  rgba(183,222,237,1) 0%,rgba(113,206,239,1) 50%,rgba(33,180,226,1) 51%,rgba(183,222,237,1) 100%); /* Chrome10+,Safari5.1+ */'
+                +'background: -o-linear-gradient(top,  rgba(183,222,237,1) 0%,rgba(113,206,239,1) 50%,rgba(33,180,226,1) 51%,rgba(183,222,237,1) 100%); /* Opera 11.10+ */'
+                +'background: -ms-linear-gradient(top,  rgba(183,222,237,1) 0%,rgba(113,206,239,1) 50%,rgba(33,180,226,1) 51%,rgba(183,222,237,1) 100%); /* IE10+ */'
+                +'background: linear-gradient(to bottom,  rgba(183,222,237,1) 0%,rgba(113,206,239,1) 50%,rgba(33,180,226,1) 51%,rgba(183,222,237,1) 100%); /* W3C */'
+                +'filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#b7deed", endColorstr="#b7deed",GradientType=0 ); /* IE6-9 */}'
     }
     
     
@@ -242,11 +365,13 @@ testilogit = {};
         options = $.extend({
             func: '',
             roots: [],
-            motivation: 0
+            motivation: 0,
+            signs: []
         }, options)
         this.func = options.func;
         this.roots = options.roots;
         this.motivation = options.motivation;
+        this.signs = options.signs;
         this.roots.sort(function(a,b){return (a.value < b.value ? -1 : 1)});
     }
     
@@ -270,8 +395,24 @@ testilogit = {};
         return this.func;
     }
     
+    PsscRow.prototype.getSign = function(n){
+        return this.signs[n];
+    }
+    
+    PsscRow.prototype.setSign = function(n, sign){
+        return this.signs[n] = sign;
+    }
+    
+    PsscRow.prototype.getMotivation = function(){
+        return this.motivation;
+    }
+    
+    PsscRow.prototype.setMotivation = function(mot){
+        return this.motivation = mot;
+    }
+    
     PsscRow.prototype.getData = function(){
-        return jQuery.extend({},{func: this.func, roots: this.roots});
+        return jQuery.extend({},{func: this.func, roots: this.roots, motivation: this.motivation, signs: this.signs});
     }
     
     PsscRow.prototype.isRoot = function(root){
