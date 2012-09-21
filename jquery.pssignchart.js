@@ -221,7 +221,7 @@ testilogit = {};
     }
     
     Pssignchart.prototype.getMot = function(row){
-        return this.rows[row].getMotivation();
+        return this.rows[row].getMotivation() || 0;
     }
     
     Pssignchart.prototype.setSign = function(row, col, sign){
@@ -229,7 +229,7 @@ testilogit = {};
     }
     
     Pssignchart.prototype.getSign = function(row, col){
-        return this.rows[row].getSign(col);
+        return this.rows[row].getSign(col) || '';
     }
     
     Pssignchart.prototype.setTotalSign = function(col, sign){
@@ -237,7 +237,7 @@ testilogit = {};
     }
     
     Pssignchart.prototype.getTotalSign = function(col){
-        return this.total[0].signs[col];
+        return this.total[0].signs[col] || '';
     }
     
     Pssignchart.prototype.getData = function(options){
