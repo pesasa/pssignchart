@@ -34,7 +34,8 @@ testilogit = {};
         var settings = $.extend({
             width: 'auto',              // width of sign chart. Defaults to width of parent element (auto)
             color: 'red',               // highlight color
-            theme: "pssc_default"       // html class for styling
+            theme: "pssc_default",      // html class for styling
+            mode: 'view'
         }, options);
 
         // Return this so that methods of jQuery element can be chained.
@@ -49,11 +50,14 @@ testilogit = {};
     Pssignchart = function(place, settings){
         // Constructor for Pssignchart object.
         this.settings = settings;
+        this.mode = settings.mode;
         this.place = $(place);
         this.place.addClass('pssignchart');
         this.rows = [];
         this.roots = [];
         this.total = [];
+        this.intervals = [];
+        this.rootpoints = [];
         
         if ($('head style#psscstyle').length == 0){
             $('head').append('<style id="psscstyle" type="text/css">'+Pssignchart.strings['style']+'</style>');
@@ -72,45 +76,63 @@ testilogit = {};
             this.width = this.settings.width;
         }
         this.place.addClass('pssc_rendered').addClass(this.settings.theme);
-        var $schart = $('<div class="pssc_tablewrapper"><table class="pssc_table"><tbody></tbody></table></div>');
+        var $schart = $('<div class="pssc_tablewrapper"><table class="pssc_table"><tbody class="pssc_body"></tbody><tbody class="pssc_intervals"><tr></tr></tbody></table></div>');
         this.schartnumber = -1;
         while ($('#signchart_'+(++this.schartnumber)).length > 0){};
         $schart.attr('id','#signchart_'+this.schartnumber)
         this.place.empty().append($schart);
         this.draw();
         this.initEvents();
+        if (this.mode === 'edit'){
+            this.place.addClass('editmode');
+            this.showEdit();
+        } else {
+            this.place.removeClass('editmode');
+        }
         return this;
     }
     
     Pssignchart.prototype.draw = function(){
+        // Draw the signchart
         var signchart = this;
-        var $tbody = this.place.find('tbody');
+        var $tbody = this.place.find('tbody.pssc_body');
         $tbody.empty();
         for (var i = 0; i < this.rows.length; i++){
             var $trow = $('<tr></tr>');
             $trow.append('<td class="pssc_func"><span class="mathquill">'+this.rows[i].func
-                +'</span></td><td class="pssc_motivation" mot="'+Pssignchart.mot[this.getMot(i)]
-                +'"><a href="javascript:;"><span></span></a></td>');
+                +'</span></td><td class="pssc_motivation" mot="'+this.getMotString(i)
+                +'"><a href="javascript:;" class="motshow"><span></span></a></td>');
             for (var j = 0; j < this.roots.length; j++){
-                var $tdata = $('<td class="pssc_sign" sign="'+this.getSign(i, j)+'"></td>');
+                var $tdata = $('<td class="pssc_sign" sign="'+this.getSign(i, j)+'"><a href="javascript:;"></a></td>');
                 if (this.rows[i].isRoot(this.roots[j])){
                     $tdata.addClass('pssc_isroot');
                 }
                 $trow.append($tdata);
             }
-            $trow.append('<td class="pssc_sign" sign="'+this.getSign(i, this.roots.length)+'"></td>');
+            $trow.append('<td class="pssc_sign" sign="'+this.getSign(i, this.roots.length)+'"><a href="javascript:;"></a></td>');
             $tbody.append($trow);
         }
         for (var i = 0; i < this.total.length; i++){
             var $trow = $('<tr class="pssc_total"></tr>');
             $trow.append('<td colspan="2" class="pssc_total"><span class="mathquill">'+this.total[i].func+'</span></td>');
             for (var j = 0; j < this.roots.length; j++){
-                $trow.append('<td class="pssc_sign" sign="'+this.getTotalSign(j)+'"></td>');
+                $trow.append('<td class="pssc_sign" sign="'+this.getTotalSign(j)+'"><a href="javascript:;"></a></td>');
             }
-            $trow.append('<td class="pssc_sign" sign="'+this.getTotalSign(this.roots.length)+'"></td>');
+            $trow.append('<td class="pssc_sign" sign="'+this.getTotalSign(this.roots.length)+'"><a href="javascript:;"></a></td>');
         }
         $tbody.append($trow);
         this.place.find('.mathquill').mathquill();
+        
+        var intervalhtml = '<td colspan="2"></td>';
+        for (var i = 0; i < this.roots.length; i++){
+            intervalhtml += '<td class="pssc_interval"><span><a href="javascript:;" class="pssc_intervalline" intervaltype="'
+                +this.getInterval(i)+'"></a><a href="javascript:;" class="pssc_rootpoint" pointtype="'
+                +this.getRootpoint(i)+'"></a></span></td>';
+        }
+        intervalhtml += '<td class="pssc_interval"><span><a href="javascript:;" class="pssc_intervalline" intervaltype="'
+            +this.getInterval(this.roots.length)+'"></a></span></td>';
+        this.place.find('table.pssc_table tbody.pssc_intervals tr').html(intervalhtml);
+        
         var $schart = this.place.find('.pssc_tablewrapper');
         $schart.find('.pssc_rootlabel').remove();
         var $tdelem = $tbody.find('tr:eq(0) td:eq(0)');
@@ -122,14 +144,25 @@ testilogit = {};
         }
         this.place.find('.mathquill:not(.mathquill-rendered-math)').mathquill();
         
+        if (this.mode === 'edit'){
+            this.initEdit();
+        }
+    }
+    
+    Pssignchart.prototype.initEdit = function(){
+        // Init editing events of the signchart
+        var signchart = this;
+        var $tbody = this.place.find('tbody.pssc_body');
+        
         // Init clicks for motivations.
         $tbody.find('td.pssc_motivation a').click(function(){
             var $motlink = $(this);
-            var $tdmot = $motlink.parent('td');
-            var rownum = $tdmot.parents('tbody').find('tr').index($tdmot.parents('tr').eq(0));
-            var newmot = signchart.rows[rownum].nextMot();
-            $tdmot.attr('mot', Pssignchart.mot[newmot]);
-            signchart.setMot(rownum, newmot);
+            if (!$motlink.hasClass('isopen')){
+                $motlink.addClass('isopen');
+                var $tdmot = $motlink.parent('td');
+                var rownum = $tdmot.parents('tbody').find('tr').index($tdmot.parents('tr').eq(0));
+                signchart.changeMotivation($tdmot, rownum);
+            }
         });
         
         // Init sign clicks for plus, minus and none.
@@ -162,7 +195,75 @@ testilogit = {};
             } else {
                 signchart.setSign(rownum, colnum, newsign);
             }
-        })
+        });
+        
+        // Init focus highlights for signs.
+        $tbody.find('td.pssc_sign a').focus(function(){
+            $(this).parent().addClass('focushere').end().blur(function(){
+                $(this).parent().removeClass('focushere');
+            });
+        });
+        
+        // Init clicks for rootpoints
+        this.place.find('tbody.pssc_intervals a.pssc_rootpoint').click(function(){
+            var $td = $(this).parents('td').eq(0);
+            var $alltds = $td.parents('tr').eq(0).children('td');
+            var rootindex = $alltds.index($td) - 1;
+            var pointtype = $(this).attr('pointtype');
+            switch (pointtype){
+                case 'open':
+                    $(this).attr('pointtype','closed');
+                    signchart.rootpoints[rootindex] = 'closed';
+                    // alert(rootindex +': closed');
+                    break;
+                case 'closed':
+                    $(this).attr('pointtype','');
+                    signchart.rootpoints[rootindex] = '';
+                    // alert(rootindex +': ');
+                    break;
+                default:
+                    $(this).attr('pointtype','open');
+                    signchart.rootpoints[rootindex] = 'open';
+                    // alert(rootindex +': open');
+            }
+        });
+        
+        // Init clicks for intervallines
+        this.place.find('tbody.pssc_intervals a.pssc_intervalline').click(function(){
+            var $td = $(this).parents('td').eq(0);
+            var $alltds = $td.parents('tr').eq(0).children('td');
+            var intindex = $alltds.index($td) - 1;
+            var intervaltype = $(this).attr('intervaltype');
+            switch (intervaltype){
+                case 'inside':
+                    $(this).attr('intervaltype','');
+                    signchart.intervals[intindex] = '';
+                    // alert(intindex+': ');
+                    break;
+                default:
+                    $(this).attr('intervaltype','inside');
+                    signchart.intervals[intindex] = 'inside';
+                    // alert(intindex+': inside');
+            }
+        });
+    }
+    
+    Pssignchart.prototype.showEdit = function(){
+        // Shows buttons for adding and removing functions.
+        var signchart = this;
+        this.place.prepend('<div class="pssc_toolbarwrapper"><ul class="pssc_toolbar"><li><a href="javascript:;" class="addrow"><span></span></a></li></ul></div>');
+        this.toolbar = this.place.find('.pssc_toolbarwrapper');
+        this.toolbar.find('a.addrow').click(function(){
+            var $tool = $(this);
+            if ($tool.hasClass('isopen')){
+                $tool.removeClass('isopen');
+                signchart.toolbar.find('.pssc_addrowbox').slideUp(500, function(){$(this).remove();});
+            } else {
+                $tool.addClass('isopen');
+                signchart.toolbar.append('<div class="pssc_addrowbox"></div>');
+                signchart.toolbar.find('.pssc_addrowbox').hide().slideDown(500);
+            }
+        });
     }
     
     Pssignchart.prototype.isInRoots = function(root){
@@ -174,6 +275,23 @@ testilogit = {};
             }
         }
         return result;
+    }
+    
+    Pssignchart.prototype.changeMotivation = function($tdelem, rownum){
+        var signchart = this;
+        var menuhtml = '<div class="motivationselectwrapper"><ul class="motivationselector">';
+        for (var i = 0; i < Pssignchart.mot.length; i++){
+            menuhtml += '<li><a href="javascript:;" mot="'+Pssignchart.mot[i]+'"><span></span></a></li>';
+        }
+        menuhtml += '</ul></div>';
+        $tdelem.append(menuhtml).find('.motivationselectwrapper ul.motivationselector').hide().fadeIn(600);
+        $tdelem.find('ul.motivationselector a').click(function(){
+            var newmot = $(this).attr('mot');
+            $tdelem.attr('mot', newmot);
+            signchart.setMotString(rownum, newmot);
+            $(this).parents('.motivationselectwrapper').find('ul.motivationselector').fadeOut(600, function(){$(this).remove()});
+            $tdelem.find('a.motshow').removeClass('isopen');
+        });
     }
     
     Pssignchart.prototype.addFunc = function(options, nodraw){
@@ -224,6 +342,16 @@ testilogit = {};
         return this.rows[row].getMotivation() || 0;
     }
     
+    Pssignchart.prototype.setMotString = function(row, motstring){
+        var mot = Pssignchart.mot.indexOf(motstring);
+        mot = (mot > -1) ? mot : 0;
+        this.setMot(row, mot);
+    }
+    
+    Pssignchart.prototype.getMotString = function(row){
+        return Pssignchart.mot[this.getMot(row)];
+    }
+    
     Pssignchart.prototype.setSign = function(row, col, sign){
         this.rows[row].setSign(col, sign);
     }
@@ -240,13 +368,31 @@ testilogit = {};
         return this.total[0].signs[col] || '';
     }
     
+    Pssignchart.prototype.setInterval = function(n, onoff){
+        return this.intervals[n] = onoff;
+    }
+    
+    Pssignchart.prototype.getInterval = function(n){
+        return this.intervals[n] || '';
+    }
+    
+    Pssignchart.prototype.setRootpoint = function(n, onoff){
+        return this.rootpoints[n] = onoff;
+    }
+    
+    Pssignchart.prototype.getRootpoint = function(n){
+        return this.rootpoints[n] || '';
+    }
+    
     Pssignchart.prototype.getData = function(options){
-        var data = {rows: [], total: {func: "", signs: []}};
+        var data = {rows: [], total: {func: "", signs: []}, intervals: [], rootpoints: []};
         for (var i=0; i<this.rows.length; i++){
             data.rows.push(this.rows[i].getData());
         }
         data.total.func = this.total[0].func;
         data.total.signs = this.total[0].signs;
+        data.intervals = this.intervals.slice(0);
+        data.rootpoints = this.rootpoints.slice(0);
         options.result = data;
     }
     
@@ -256,6 +402,8 @@ testilogit = {};
             this.addFunc(options.rows[i], true);
         }
         this.addTotal(options.total, true);
+        this.intervals = options.intervals.slice(0);
+        this.rootpoints = options.rootpoints.slice(0);
         this.draw();
     }
     
@@ -301,14 +449,17 @@ testilogit = {};
     Pssignchart.strings = {
         style:
             '.pssc_default {min-height: 2em; background-color: white; padding: 15px; border: 1px solid black; border-radius: 15px; box-shadow: 5px 5px 5px rgba(0,0,0,0.5); margin: 1em 0; text-align: center;'
-                + 'background: rgb(254,255,232); /* Old browsers */ background: -moz-linear-gradient(top,  rgba(254,255,232,1) 0%, rgba(214,219,191,1) 100%); /* FF3.6+ */'
+                +'background: rgb(254,255,232); /* Old browsers */ background: -moz-linear-gradient(top,  rgba(254,255,232,1) 0%, rgba(214,219,191,1) 100%); /* FF3.6+ */'
                 +'background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(254,255,232,1)), color-stop(100%,rgba(214,219,191,1))); /* Chrome,Safari4+ */'
                 +'background: -webkit-linear-gradient(top,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* Chrome10+,Safari5.1+ */'
                 +'background: -o-linear-gradient(top,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* Opera 11.10+ */'
                 +'background: -ms-linear-gradient(top,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* IE10+ */'
                 +'background: linear-gradient(to bottom,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* W3C */'
                 +'filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#feffe8", endColorstr="#d6dbbf",GradientType=0 ); /* IE6-9 */}'
-            +'.pssc_default table.pssc_table {border-collapse: collapse; border: 1px solid black; margin: 0.2em auto;}'
+            +'.pssc_default table.pssc_table {border-collapse: collapse; margin: 0.2em auto;}'
+            +'.pssignchart {position: relative;}'
+            +'.pssignchart.editmode {margin-bottom: 6em;}'
+            +'.pssc_default table.pssc_table tbody.pssc_body {border: 1px solid black;}'
             +'table.pssc_table tr:nth-child(even) td {background-color: #eef;/*#dfb;*/}'
             +'table.pssc_table tr:nth-child(odd) td {background-color: white;}'
             +'table.pssc_table tr.pssc_total {border-top: 4px solid black;}'
@@ -321,7 +472,7 @@ testilogit = {};
             +'table.pssc_table td.pssc_motivation {padding: 0 1em; border-right: 1px solid black; cursor: pointer; padding: 0;}'
             +'table.pssc_table td.pssc_motivation a span {width: 30px; height: 20px; display: block; margin: 0 auto;}'
             +'table.pssc_table td.pssc_motivation a {text-align: center; display: block; border: 1px solid #777; border-radius: 4px; margin: 2px;}'
-            +'.pssc_default, table.pssc_table td.pssc_motivation a {'
+            +'.pssc_default, table.pssc_table td.pssc_motivation a, .pssignchart .pssc_toolbar li a {'
                 +'background: rgb(255,255,255); /* Old browsers */'
                 +'background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%); /* FF3.6+ */'
                 +'background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(47%,rgba(246,246,246,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */'
@@ -331,16 +482,29 @@ testilogit = {};
                 +'background: linear-gradient(to bottom,  rgba(255,255,255,1) 0%,rgba(246,246,246,1) 47%,rgba(237,237,237,1) 100%); /* W3C */'
                 +'filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#ffffff", endColorstr="#ededed",GradientType=0 ); /* IE6-9 */}'
             +'table.pssc_table td.pssc_total {padding: 0 1em; border-right: 1px solid black;}'
-            +'table.pssc_table td.pssc_motivation[mot="linear-asc"] span {background-image: url(images/linear-asc.png); background-position: center center; background-repeat: no-repeat;}'
-            +'table.pssc_table td.pssc_motivation[mot="linear-desc"] span {background-image: url(images/linear-desc.png); background-position: center center; background-repeat: no-repeat;}'
-            +'table.pssc_table td.pssc_motivation[mot="parab-up-0"] span {background-image: url(images/parab-up-0.png); background-position: center center; background-repeat: no-repeat;}'
-            +'table.pssc_table td.pssc_motivation[mot="parab-up-1"] span {background-image: url(images/parab-up-1.png); background-position: center center; background-repeat: no-repeat;}'
-            +'table.pssc_table td.pssc_motivation[mot="parab-up-2"] span {background-image: url(images/parab-up-2.png); background-position: center center; background-repeat: no-repeat;}'
-            +'table.pssc_table td.pssc_motivation[mot="parab-down-0"] span {background-image: url(images/parab-down-0.png); background-position: center center; background-repeat: no-repeat;}'
-            +'table.pssc_table td.pssc_motivation[mot="parab-down-1"] span {background-image: url(images/parab-down-1.png); background-position: center center; background-repeat: no-repeat;}'
-            +'table.pssc_table td.pssc_motivation[mot="parab-down-2"] span {background-image: url(images/parab-down-2.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="linear-asc"] a.motshow span, ul.motivationselector a[mot="linear-asc"] span '
+                +'{background-image: url(images/linear-asc.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="linear-desc"] a.motshow span, ul.motivationselector a[mot="linear-desc"] span '
+                +'{background-image: url(images/linear-desc.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-up-0"] a.motshow span, ul.motivationselector a[mot="parab-up-0"] span '
+                +'{background-image: url(images/parab-up-0.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-up-1"] a.motshow span, ul.motivationselector a[mot="parab-up-1"] span '
+                +'{background-image: url(images/parab-up-1.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-up-2"] a.motshow span, ul.motivationselector a[mot="parab-up-2"] span '
+                +'{background-image: url(images/parab-up-2.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-down-0"] a.motshow span, ul.motivationselector a[mot="parab-down-0"] span '
+                +'{background-image: url(images/parab-down-0.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-down-1"] a.motshow span, ul.motivationselector a[mot="parab-down-1"] span '
+                +'{background-image: url(images/parab-down-1.png); background-position: center center; background-repeat: no-repeat;}'
+            +'table.pssc_table td.pssc_motivation[mot="parab-down-2"] a.motshow span, ul.motivationselector a[mot="parab-down-2"] span '
+                +'{background-image: url(images/parab-down-2.png); background-position: center center; background-repeat: no-repeat;}'
+            +'.motivationselectwrapper {position: relative;}'
+            +'.motivationselectwrapper ul.motivationselector {position: absolute; top: -25px; left: -6px; list-style: none; margin: 0; padding: 2px; width: 102px; background-color: #eee;'
+                +'border: 1px solid #777; border-radius: 4px; box-shadow: 4px 4px 4px rgba(0,0,0,0.5); z-index: 10;}'
+            +'.motivationselectwrapper ul.motivationselector li {display: inline-block; margin: 1px; padding: 0; vertical-align: top;}'
+            +'.motivationselectwrapper ul.motivationselector li a {width: 30px; height: 20px; margin: 0; padding: 0; display: block;}'
             +'table.pssc_table td.pssc_sign {cursor: pointer;}'
-            +'table.pssc_table td.pssc_sign[sign="plus"]::before {content: "+"; font-weight: bold; display: block; text-align: center; color: white; text-shadow: 0 0 1px black;}'
+            +'table.pssc_table td.pssc_sign[sign="plus"]:before {content: "+"; font-weight: bold; display: block; text-align: center; color: white; text-shadow: 0 0 1px black;}'
             +'table.pssc_table td.pssc_sign[sign="plus"] {background: rgb(248,80,50); /* Old browsers */'
                 +'background: -moz-linear-gradient(top,  rgba(248,80,50,1) 0%, rgba(241,111,92,1) 50%, rgba(246,41,12,1) 51%, rgba(240,47,23,1) 71%, rgba(231,56,39,1) 100%); /* FF3.6+ */'
                 +'background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(248,80,50,1)), color-stop(50%,rgba(241,111,92,1)), color-stop(51%,rgba(246,41,12,1)), color-stop(71%,rgba(240,47,23,1)), color-stop(100%,rgba(231,56,39,1))); /* Chrome,Safari4+ */'
@@ -358,6 +522,23 @@ testilogit = {};
                 +'background: -ms-linear-gradient(top,  rgba(183,222,237,1) 0%,rgba(113,206,239,1) 50%,rgba(33,180,226,1) 51%,rgba(183,222,237,1) 100%); /* IE10+ */'
                 +'background: linear-gradient(to bottom,  rgba(183,222,237,1) 0%,rgba(113,206,239,1) 50%,rgba(33,180,226,1) 51%,rgba(183,222,237,1) 100%); /* W3C */'
                 +'filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#b7deed", endColorstr="#b7deed",GradientType=0 ); /* IE6-9 */}'
+            +'table.pssc_table .focushere {box-shadow: 2px 2px 1px green, -2px -2px 1px green, 2px -2px 1px green, -2px 2px 1px green;}'
+            +'.pssc_default table.pssc_table tbody.pssc_intervals {border: none; background-color: transparent;}'
+            +'.pssc_default table.pssc_table tbody.pssc_intervals td {border: none; background-color: transparent; height: 1em;}'
+            +'.pssc_default table.pssc_table tbody.pssc_intervals td.pssc_interval {border-bottom: 1px dotted #777; vertical-align: bottom;}'
+            +'.pssc_default table.pssc_table tbody.pssc_intervals td.pssc_interval span {display: block; margin: 0; padding: 0; position: relative;}'
+            +'.pssc_default table.pssc_table tbody.pssc_intervals td.pssc_interval span a.pssc_rootpoint {display: inline-block; position: absolute; width: 8px; height: 8px; right: -5px; bottom: -6px; border: 1px solid #bbb; border-radius: 5px; z-index: 5;}'
+            +'.pssc_default table.pssc_table tbody.pssc_intervals td.pssc_interval span a.pssc_rootpoint[pointtype="open"] {border: 2px solid red; background-color: white;}'
+            +'.pssc_default table.pssc_table tbody.pssc_intervals td.pssc_interval span a.pssc_rootpoint[pointtype="closed"] {border: 1px solid red; background-color: red;}'
+            +'.pssc_default table.pssc_table tbody.pssc_intervals td.pssc_interval span a.pssc_intervalline {display: block; height: 4px; position: absolute; left: 0; right: 0; bottom: -3px;}'
+            +'.pssc_default table.pssc_table tbody.pssc_intervals td.pssc_interval span a.pssc_intervalline[intervaltype="inside"] {border-bottom: 4px solid red;}'
+            +'.pssignchart .pssc_toolbarwrapper {text-align: left; margin: 0 2em; position: relative;}'
+            +'.pssignchart ul.pssc_toolbar {list-style: none; margin: 0; padding: 0;}'
+            +'.pssignchart ul.pssc_toolbar li {margin: 0 0.3em; padding: 0; display: inline-block;}'
+            +'.pssignchart ul.pssc_toolbar li a {display: block; border: 1px solid #777; border-radius: 4px; height: 20px; width: 20px;}'
+            +'.pssignchart ul.pssc_toolbar li a.isopen {border-color: red;}'
+            +'.pssignchart .pssc_toolbarwrapper .pssc_addrowbox {position: absolute; left: 4em; right: 4em; bottom: 3em;'
+                +'height: 4em; border: 1px solid #777; border-bottom: none; border-radius: 1em 1em 0 0; background-color: white;}'
     }
     
     
