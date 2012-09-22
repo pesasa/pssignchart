@@ -10,7 +10,7 @@
         <script type="text/javascript" src="jquery.pssignchart.js"></script>
         <script type="text/javascript">
             jQuery(function(){
-                jQuery('.pssc1').pssignchart();
+                jQuery('.pssc1').pssignchart({mode: 'edit'});
                 jQuery('.pssc1').pssignchart('add', {func: '2x-3', roots:[{label:'\\frac{3}{2}', value:1.5}]});
                 jQuery('.pssc1').pssignchart('add', {func: 'x^2', roots:[{label:'0', value:0}]});
                 jQuery('.pssc1').pssignchart('add', {func: 'x-2', roots: [2]});
