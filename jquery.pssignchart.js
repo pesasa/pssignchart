@@ -47,7 +47,7 @@ testilogit = {};
         });
     }
     
-    Pssignchart = function(place, settings){
+    var Pssignchart = function(place, settings){
         // Constructor for Pssignchart object.
         this.settings = settings;
         this.mode = settings.mode;
@@ -542,7 +542,7 @@ testilogit = {};
     }
     
     
-    PsscRow = function(options){
+    var PsscRow = function(options){
         options = $.extend({
             func: '',
             roots: [],
@@ -614,7 +614,7 @@ testilogit = {};
     
 
 
-    PsscRoot = function(options){
+    var PsscRoot = function(options){
         this.label = options.label;
         this.value = options.value;
     }
@@ -629,6 +629,49 @@ testilogit = {};
     
     PsscRoot.prototype.getLabel = function(){
         return this.label;
+    }
+
+
+    var latexeval = function(expression){
+        var latexrep = [
+            [/\\sqrt{([^{}]*)}/ig, 'sqrt($1)'],
+            [/\\frac{([^{}]*)}{([^{}]*)}/ig, '(($1)/($2))'],
+            [/([0-9x]+)\^((?:[0-9])|(?:{[0-9]+}))/ig, 'pow($1, $2)']
+        ]
+        var reponce = [
+            [/\\left\(/ig, '('],
+            [/\\right\)/ig, ')'],
+            [/\)\(/ig, ')*(']
+        ]
+        var oldexpr = '';
+        while (oldexpr !== expression){
+            oldexpr = expression;
+            for (var i = 0; i < latexrep.length; i++){
+                expression = expression.replace(latexrep[i][0], latexrep[i][1]);
+            }
+        }
+        for (var i = 0; i < reponce.length; i++){
+            expression = expression.replace(reponce[i][0], reponce[i][1]);
+        }
+        var reg = /(?:[a-z$_][a-z0-9$_]*)|(?:[;={}\[\]"'!&<>^\\?:])/ig,
+            valid = true;
+        expression = expression.replace(reg, function(word){
+            if (Math.hasOwnProperty(word)){
+                return 'Math.'+word;
+            } else {
+                valid = false;
+                return word;
+            }
+        });
+        if (!valid){
+            alert('Invalid expression!');
+        } else {
+            try {
+                return (new Function('return ('+expression+')'))();
+            } catch (err) {
+                alert('Invalid expression!');
+            }
+        }
     }
     
 })(jQuery)
