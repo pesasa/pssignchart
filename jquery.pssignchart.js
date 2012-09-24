@@ -260,8 +260,10 @@ testilogit = {};
                 signchart.toolbar.find('.pssc_addrowbox').slideUp(500, function(){$(this).remove();});
             } else {
                 $tool.addClass('isopen');
-                signchart.toolbar.append('<div class="pssc_addrowbox"></div>');
-                signchart.toolbar.find('.pssc_addrowbox').hide().slideDown(500);
+                signchart.toolbar.append('<div class="pssc_addrowbox"><a href="javascript:;" class="pssc_addfuncbutton">+</a>'
+                    +'<span class="mathquill-editable pssc_newfunc"></span>'
+                    +'<div class="pssc_newroots"><span class="mathquill-editable pssc_newroot1"></span><span class="mathquill-editable pssc_newroot2"></span></div></div>');
+                signchart.toolbar.find('.pssc_addrowbox').hide().slideDown(500, function(){$(this).find('.mathquill-editable').mathquill('editable').focus();});
             }
         });
     }
@@ -533,12 +535,14 @@ testilogit = {};
             +'.pssc_default table.pssc_table tbody.pssc_intervals td.pssc_interval span a.pssc_intervalline {display: block; height: 4px; position: absolute; left: 0; right: 0; bottom: -3px;}'
             +'.pssc_default table.pssc_table tbody.pssc_intervals td.pssc_interval span a.pssc_intervalline[intervaltype="inside"] {border-bottom: 4px solid red;}'
             +'.pssignchart .pssc_toolbarwrapper {text-align: left; margin: 0 2em; position: relative;}'
-            +'.pssignchart ul.pssc_toolbar {list-style: none; margin: 0; padding: 0;}'
+            +'.pssignchart ul.pssc_toolbar {list-style: none; margin: 0; padding: 0; float:left;}'
             +'.pssignchart ul.pssc_toolbar li {margin: 0 0.3em; padding: 0; display: inline-block;}'
             +'.pssignchart ul.pssc_toolbar li a {display: block; border: 1px solid #777; border-radius: 4px; height: 20px; width: 20px;}'
             +'.pssignchart ul.pssc_toolbar li a.isopen {border-color: red;}'
-            +'.pssignchart .pssc_toolbarwrapper .pssc_addrowbox {position: absolute; left: 4em; right: 4em; bottom: 3em;'
-                +'height: 4em; border: 1px solid #777; border-bottom: none; border-radius: 1em 1em 0 0; background-color: white;}'
+            +'.pssignchart .pssc_toolbarwrapper .pssc_addrowbox {/*height: 4em;*/ border: 1px solid #777; border-radius: 0.5em; background-color: white; margin-bottom: 2em; margin-left: 60px;}'
+            // +'.pssignchart .pssc_toolbarwrapper .pssc_addrowbox {position: absolute; left: 4em; right: 4em; bottom: 3em;'
+                // +'height: 4em; border: 1px solid #777; border-bottom: none; border-radius: 1em 1em 0 0; background-color: white;}'
+            +'.pssignchart .pssc_toolbarwrapper .pssc_newfunc {display: inline-block; min-width: 5em; margin: 0.5em 1em;}'
     }
     
     
@@ -636,7 +640,7 @@ testilogit = {};
         var latexrep = [
             [/\\sqrt{([^{}]*)}/ig, 'sqrt($1)'],
             [/\\frac{([^{}]*)}{([^{}]*)}/ig, '(($1)/($2))'],
-            [/([0-9x]+)\^((?:[0-9])|(?:{[0-9]+}))/ig, 'pow($1, $2)']
+            [/((?:[0-9]+)|(?:\([^\(\)]\)))\^((?:[0-9])|(?:{[0-9]+}))/ig, 'pow($1, $2)']
         ]
         var reponce = [
             [/\\left\(/ig, '('],
