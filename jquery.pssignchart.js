@@ -257,13 +257,39 @@ testilogit = {};
             var $tool = $(this);
             if ($tool.hasClass('isopen')){
                 $tool.removeClass('isopen');
-                signchart.toolbar.find('.pssc_addrowbox').slideUp(500, function(){$(this).remove();});
+                signchart.toolbar.find('.pssc_addrowbox').fadeOut(300, function(){$(this).remove();});
             } else {
                 $tool.addClass('isopen');
                 signchart.toolbar.append('<div class="pssc_addrowbox"><a href="javascript:;" class="pssc_addfuncbutton">+</a>'
                     +'<span class="mathquill-editable pssc_newfunc"></span>'
                     +'<div class="pssc_newroots"><span class="mathquill-editable pssc_newroot1"></span><span class="mathquill-editable pssc_newroot2"></span></div></div>');
-                signchart.toolbar.find('.pssc_addrowbox').hide().slideDown(500, function(){$(this).find('.mathquill-editable').mathquill('editable').focus();});
+                signchart.toolbar.find('.pssc_addrowbox').hide().fadeIn(300, function(){$(this).find('.mathquill-editable').mathquill('editable').focus();});
+                signchart.toolbar.find('a.pssc_addfuncbutton').click(function(){
+                    var newfunc = signchart.toolbar.find('.pssc_newfunc').mathquill('latex');
+                    var newroot1 = signchart.toolbar.find('.pssc_newroot1').mathquill('latex');
+                    var newroot2 = signchart.toolbar.find('.pssc_newroot2').mathquill('latex');
+                    var newroot1val, newroot2val;
+                    try {
+                        newroot1val = latexeval(newroot1);
+                    } catch (err){
+                        if (err === 'Invalidexpression'){
+                            signchart.toolbar.find('.pssc_newroot1').addClass('inputerror').focus().delay(2000).queue(function(){$(this).removeClass('inputerror');$(this).dequeue();});
+                        }
+                    }
+                    try {
+                        newroot2val = latexeval(newroot2);
+                    } catch (err){
+                        if (err === 'Invalidexpression'){
+                            signchart.toolbar.find('.pssc_newroot2').addClass('inputerror').focus().delay(2000).queue(function(){$(this).removeClass('inputerror');$(this).dequeue();});
+                        }
+                    }
+                    if (typeof(newroot1val) === 'number' && typeof(newroot2val) === 'number'){
+                        signchart.place.trigger('add', {func: newfunc, roots:[{label: newroot1, value: newroot1val}, {label: newroot2, value: latexeval(newroot2)}]});
+                        signchart.toolbar.find('.pssc_newfunc').mathquill('latex','');
+                        signchart.toolbar.find('.pssc_newroot1').mathquill('latex','');
+                        signchart.toolbar.find('.pssc_newroot2').mathquill('latex','');
+                    }
+                });
             }
         });
     }
@@ -458,23 +484,24 @@ testilogit = {};
                 +'background: -ms-linear-gradient(top,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* IE10+ */'
                 +'background: linear-gradient(to bottom,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* W3C */'
                 +'filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#feffe8", endColorstr="#d6dbbf",GradientType=0 ); /* IE6-9 */}'
+            +'.pssignchart .pssc_tablewrapper {clear: both;}'
             +'.pssc_default table.pssc_table {border-collapse: collapse; margin: 0.2em auto;}'
             +'.pssignchart {position: relative;}'
-            +'.pssignchart.editmode {margin-bottom: 6em;}'
+            +'.pssignchart.editmode {margin-bottom: 2em;}'
             +'.pssc_default table.pssc_table tbody.pssc_body {border: 1px solid black;}'
             +'table.pssc_table tr:nth-child(even) td {background-color: #eef;/*#dfb;*/}'
             +'table.pssc_table tr:nth-child(odd) td {background-color: white;}'
             +'table.pssc_table tr.pssc_total {border-top: 4px solid black;}'
             +'.pssc_tablewrapper {margin: 0 auto; padding-top: 1.5em; position: relative; display: inline-block; text-align: left;}'
             +'.pssc_rootlabel {position: absolute; top: 0; width: auto; overflow: visible; text-align: center; height: 0.5em; white-space: nowrap;}'
-            +'.pssc_rootlabel > span.mathquill {display: inline-block; position: relative; left: -50%; margin-top: -1em; vertical-align: middle;}'
+            +'.pssc_rootlabel > span.mathquill {display: inline-block; position: relative; left: -50%; margin-top: -1em; vertical-align: middle; white-space: nowrap;}'
             +'table.pssc_table td.pssc_isroot {border-right: 2px solid black;}'
             +'table.pssc_table td {min-width: 3em; border-right: 1px dotted black; padding: 0;}'
             +'table.pssc_table td.pssc_func {padding: 0 1em; border-right: none;}'
             +'table.pssc_table td.pssc_motivation {padding: 0 1em; border-right: 1px solid black; cursor: pointer; padding: 0;}'
             +'table.pssc_table td.pssc_motivation a span {width: 30px; height: 20px; display: block; margin: 0 auto;}'
             +'table.pssc_table td.pssc_motivation a {text-align: center; display: block; border: 1px solid #777; border-radius: 4px; margin: 2px;}'
-            +'.pssc_default, table.pssc_table td.pssc_motivation a, .pssignchart .pssc_toolbar li a {'
+            +'.pssc_default, table.pssc_table td.pssc_motivation a, .pssignchart .pssc_toolbar li a, .pssignchart .pssc_addfuncbutton {'
                 +'background: rgb(255,255,255); /* Old browsers */'
                 +'background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%); /* FF3.6+ */'
                 +'background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(47%,rgba(246,246,246,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */'
@@ -534,15 +561,18 @@ testilogit = {};
             +'.pssc_default table.pssc_table tbody.pssc_intervals td.pssc_interval span a.pssc_rootpoint[pointtype="closed"] {border: 1px solid red; background-color: red;}'
             +'.pssc_default table.pssc_table tbody.pssc_intervals td.pssc_interval span a.pssc_intervalline {display: block; height: 4px; position: absolute; left: 0; right: 0; bottom: -3px;}'
             +'.pssc_default table.pssc_table tbody.pssc_intervals td.pssc_interval span a.pssc_intervalline[intervaltype="inside"] {border-bottom: 4px solid red;}'
-            +'.pssignchart .pssc_toolbarwrapper {text-align: left; margin: 0 2em; position: relative;}'
+            +'.pssignchart .pssc_toolbarwrapper {text-align: left; margin: 0 2em; position: relative; min-height: 4em;}'
             +'.pssignchart ul.pssc_toolbar {list-style: none; margin: 0; padding: 0; float:left;}'
             +'.pssignchart ul.pssc_toolbar li {margin: 0 0.3em; padding: 0; display: inline-block;}'
             +'.pssignchart ul.pssc_toolbar li a {display: block; border: 1px solid #777; border-radius: 4px; height: 20px; width: 20px;}'
             +'.pssignchart ul.pssc_toolbar li a.isopen {border-color: red;}'
-            +'.pssignchart .pssc_toolbarwrapper .pssc_addrowbox {/*height: 4em;*/ border: 1px solid #777; border-radius: 0.5em; background-color: white; margin-bottom: 2em; margin-left: 60px;}'
+            +'.pssignchart .pssc_toolbarwrapper .pssc_addrowbox {margin-bottom: 0; margin-left: 60px; vertical-align: top;}'
             // +'.pssignchart .pssc_toolbarwrapper .pssc_addrowbox {position: absolute; left: 4em; right: 4em; bottom: 3em;'
                 // +'height: 4em; border: 1px solid #777; border-bottom: none; border-radius: 1em 1em 0 0; background-color: white;}'
-            +'.pssignchart .pssc_toolbarwrapper .pssc_newfunc {display: inline-block; min-width: 5em; margin: 0.5em 1em;}'
+            +'.pssignchart .pssc_toolbarwrapper .pssc_newfunc {display: inline-block; min-width: 5em; min-height: 1.3em; margin: 0 1em;}'
+            +'.pssignchart .pssc_toolbarwrapper .pssc_newroots, .pssignchart .pssc_toolbarwrapper .pssc_newroot1, .pssignchart .pssc_toolbarwrapper .pssc_newroot2 {display: inline-block; min-width: 4em; min-height: 1.3em; margin: 0 0.5em;}'
+            +'.pssignchart .pssc_addfuncbutton {border: 1px solid #777; border-radius: 4px; text-decoration: none; font-weight: bold; display: inline-block; text-align: center; width: 1.5em; height: 1.5em; padding: 0; margin: 0.2em; vertical-align: top;}'
+            +'.pssignchart .inputerror {background-color: #faa;}'
     }
     
     
@@ -645,7 +675,8 @@ testilogit = {};
         var reponce = [
             [/\\left\(/ig, '('],
             [/\\right\)/ig, ')'],
-            [/\)\(/ig, ')*(']
+            [/\)\(/ig, ')*('],
+            [/\\cdot/ig, '*']
         ]
         var oldexpr = '';
         while (oldexpr !== expression){
@@ -673,7 +704,7 @@ testilogit = {};
             try {
                 return (new Function('return ('+expression+')'))();
             } catch (err) {
-                alert('Invalid expression!');
+                throw 'Invalidexpression';
             }
         }
     }
