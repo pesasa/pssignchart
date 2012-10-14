@@ -55,7 +55,7 @@ testilogit = {};
         this.place.addClass('pssignchart');
         this.rows = [];
         this.roots = [];
-        this.total = [];
+        this.total = {func: '', signs: ['']};
         this.intervals = [];
         this.rootpoints = [];
         
@@ -97,32 +97,41 @@ testilogit = {};
         var signchart = this;
         var $tbody = this.place.find('tbody.pssc_body');
         $tbody.empty();
+        // Draw each function row.
         for (var i = 0; i < this.rows.length; i++){
             var $trow = $('<tr></tr>');
             $trow.append('<td class="pssc_func"><span class="mathquill">'+this.rows[i].func
                 +'</span></td><td class="pssc_motivation" mot="'+this.getMotString(i)
                 +'"><a href="javascript:;" class="motshow"><span></span></a></td>');
-            for (var j = 0; j < this.roots.length; j++){
-                var $tdata = $('<td class="pssc_sign" sign="'+this.getSign(i, j)+'"><a href="javascript:;"></a></td>');
+            // Draw each "slot" in a function row.
+            for (var j = 0, rowroot = 0; j < this.roots.length; j++){
+                var $tdata = $('<td class="pssc_sign" sign="'+this.getSign(i, rowroot)+'" rootnum="'+rowroot+'"><a href="javascript:;"></a></td>');
                 if (this.rows[i].isRoot(this.roots[j])){
                     $tdata.addClass('pssc_isroot');
+                    rowroot++;
                 }
                 $trow.append($tdata);
             }
-            $trow.append('<td class="pssc_sign" sign="'+this.getSign(i, this.roots.length)+'"><a href="javascript:;"></a></td>');
+            $trow.append('<td class="pssc_sign" sign="'+this.getSign(i, rowroot)+'" rootnum="'+rowroot+'"><a href="javascript:;"></a></td>');
             $tbody.append($trow);
         }
-        for (var i = 0; i < this.total.length; i++){
-            var $trow = $('<tr class="pssc_total"></tr>');
-            $trow.append('<td colspan="2" class="pssc_total"><span class="mathquill">'+this.total[i].func+'</span></td>');
-            for (var j = 0; j < this.roots.length; j++){
-                $trow.append('<td class="pssc_sign" sign="'+this.getTotalSign(j)+'"><a href="javascript:;"></a></td>');
-            }
-            $trow.append('<td class="pssc_sign" sign="'+this.getTotalSign(this.roots.length)+'"><a href="javascript:;"></a></td>');
+        // Draw the total row.
+        var $trow = $('<tr class="pssc_total"></tr>');
+        $trow.append('<td colspan="2" class="pssc_total"><span class="mathquill">'+this.total.func+'</span></td>');
+        for (var j = 0; j < this.roots.length; j++){
+            $trow.append('<td class="pssc_sign" sign="'+this.getTotalSign(j)+'" rootnum="'+j+'"><a href="javascript:;"></a></td>');
         }
+        $trow.append('<td class="pssc_sign" sign="'+this.getTotalSign(this.roots.length)+'" rootnum="'+this.roots.length+'"><a href="javascript:;"></a></td>');
+
         $tbody.append($trow);
-        this.place.find('.mathquill').mathquill();
-        
+        // Function on total row is editable, if in edit-mode.
+        if (this.mode === 'edit'){
+            $tbody.find('tr.pssc_total td span.mathquill').addClass('mathquill-editable');
+        }
+        this.place.find('.mathquill-editable').mathquill('editable');
+        this.place.find('.mathquill:not(.mathquill-rendered-math)').mathquill();
+
+        // Add intervals
         var intervalhtml = '<td colspan="2"></td>';
         for (var i = 0; i < this.roots.length; i++){
             intervalhtml += '<td class="pssc_interval"><span><a href="javascript:;" class="pssc_intervalline" intervaltype="'
@@ -132,7 +141,8 @@ testilogit = {};
         intervalhtml += '<td class="pssc_interval"><span><a href="javascript:;" class="pssc_intervalline" intervaltype="'
             +this.getInterval(this.roots.length)+'"></a></span></td>';
         this.place.find('table.pssc_table tbody.pssc_intervals tr').html(intervalhtml);
-        
+
+        // Add labels for roots.
         var $schart = this.place.find('.pssc_tablewrapper');
         $schart.find('.pssc_rootlabel').remove();
         var $tdelem = $tbody.find('tr:eq(0) td:eq(0)');
@@ -143,7 +153,8 @@ testilogit = {};
             $schart.append('<div class="pssc_rootlabel" style="left:'+xpos+'px;"><span class="mathquill">'+this.roots[i].label+'</span></div>');
         }
         this.place.find('.mathquill:not(.mathquill-rendered-math)').mathquill();
-        
+
+        // If in editmode, init all actions.
         if (this.mode === 'edit'){
             this.initEdit();
         }
@@ -167,13 +178,16 @@ testilogit = {};
         
         // Init sign clicks for plus, minus and none.
         $tbody.find('td.pssc_sign').click(function(){
+            var $tdsign = $(this);
+            $tdsign.trigger('pssc_signchange');
+        });
+        
+        // Init sign clicks for plus, minus and none.
+        $tbody.find('td.pssc_sign').bind('pssc_signchange', function(){
             var $td = $(this);
             var rownum = $td.parents('tbody').find('tr').index($td.parents('tr').eq(0));
-            var colnum = $td.parents('tr').eq(0).find('td').index($td) - 2;
+            var rootnum = parseInt($td.attr('rootnum'));
             var istotal = $td.parents('tr').eq(0).hasClass('pssc_total');
-            if (istotal){
-                colnum += 1;
-            }
             var sign = $td.attr('sign');
             var newsign;
             switch (sign){
@@ -189,11 +203,11 @@ testilogit = {};
                 default:
                     newsign = '';
             }
-            $td.attr('sign', newsign);
+            $td.parent('tr').find('td[rootnum="'+rootnum+'"]').attr('sign', newsign);
             if (istotal){
-                signchart.setTotalSign(colnum, newsign);
+                signchart.setTotalSign(rootnum, newsign);
             } else {
-                signchart.setSign(rownum, colnum, newsign);
+                signchart.setSign(rownum, rootnum, newsign);
             }
         });
         
@@ -246,6 +260,11 @@ testilogit = {};
                     // alert(intindex+': inside');
             }
         });
+        
+        // Init focusout for function on total row.
+        this.place.find('tbody.pssc_body tr.pssc_total td.pssc_total span.mathquill-editable').focusout(function(){
+            signchart.total.func = $(this).mathquill('latex');
+        });
     }
     
     Pssignchart.prototype.showEdit = function(){
@@ -260,10 +279,17 @@ testilogit = {};
                 signchart.toolbar.find('.pssc_addrowbox').fadeOut(300, function(){$(this).remove();});
             } else {
                 $tool.addClass('isopen');
-                signchart.toolbar.append('<div class="pssc_addrowbox"><a href="javascript:;" class="pssc_addfuncbutton">+</a>'
-                    +'<span class="mathquill-editable pssc_newfunc"></span>'
-                    +'<div class="pssc_newroots"><span class="mathquill-editable pssc_newroot1"></span><span class="mathquill-editable pssc_newroot2"></span></div></div>');
-                signchart.toolbar.find('.pssc_addrowbox').hide().fadeIn(300, function(){$(this).find('.mathquill-editable').mathquill('editable').focus();});
+                signchart.toolbar.append('<div class="pssc_addrowbox pssc_bggrad"><a href="javascript:;" class="pssc_addfuncbutton">+</a>'
+                    +'<span class="pssc_newfunc_title">f:</span><span class="mathquill-editable pssc_newfunc"></span>'
+                    +'<div class="pssc_newroots" roots="0"><a href="javascript:;" class="pssc_newroots_title">0</a><span class="mathquill-editable pssc_newroot1"></span><span class="mathquill-editable pssc_newroot2"></span></div></div>');
+                signchart.toolbar.find('.pssc_addrowbox').hide().fadeIn(300, function(){$(this).find('.mathquill-editable').mathquill('editable').eq(0).focus();});
+                signchart.toolbar.find('.pssc_addrowbox .pssc_newroots_title').click(function(){
+                    var $newroots = $(this).parents('.pssc_newroots');
+                    var amount = parseInt($newroots.attr('roots'));
+                    amount = (amount + 1) % 3;
+                    $newroots.attr('roots', amount);
+                    $(this).html(amount);
+                });
                 signchart.toolbar.find('a.pssc_addfuncbutton').click(function(){
                     var newfunc = signchart.toolbar.find('.pssc_newfunc').mathquill('latex');
                     var newroot1 = signchart.toolbar.find('.pssc_newroot1').mathquill('latex');
@@ -355,7 +381,7 @@ testilogit = {};
     Pssignchart.prototype.addTotal = function(options, nodraw){
         options.func = options.func || '';
         options.signs = options.signs || [];
-        this.total = [{func: options.func, signs: options.signs}];
+        this.total = {func: options.func, signs: options.signs};
         if (!nodraw){
             this.draw();
         }
@@ -389,11 +415,11 @@ testilogit = {};
     }
     
     Pssignchart.prototype.setTotalSign = function(col, sign){
-        this.total[0].signs[col] = sign;
+        this.total.signs[col] = sign;
     }
     
     Pssignchart.prototype.getTotalSign = function(col){
-        return this.total[0].signs[col] || '';
+        return this.total.signs[col] || '';
     }
     
     Pssignchart.prototype.setInterval = function(n, onoff){
@@ -417,8 +443,8 @@ testilogit = {};
         for (var i=0; i<this.rows.length; i++){
             data.rows.push(this.rows[i].getData());
         }
-        data.total.func = this.total[0].func;
-        data.total.signs = this.total[0].signs;
+        data.total.func = this.total.func;
+        data.total.signs = this.total.signs;
         data.intervals = this.intervals.slice(0);
         data.rootpoints = this.rootpoints.slice(0);
         options.result = data;
@@ -433,12 +459,21 @@ testilogit = {};
         this.intervals = options.intervals.slice(0);
         this.rootpoints = options.rootpoints.slice(0);
         this.draw();
+        this.changed();
     }
     
     Pssignchart.prototype.empty = function(){
         this.rows = [];
         this.roots = [];
-        this.total = [];
+        this.total = {func: '', signs: ['']};
+        this.intervals = [];
+        this.rootpoints = [];
+        this.draw();
+        this.changed();
+    }
+    
+    Pssignchart.prototype.changed = function(){
+        this.place.trigger('pssc_changed');
     }
     
     Pssignchart.prototype.initEvents = function(){
@@ -459,6 +494,10 @@ testilogit = {};
             schart.setData(options);
         })
         
+        this.place.bind('empty', function(e, options){
+            schart.empty();
+        })
+        
         return this;
     }
     
@@ -476,8 +515,8 @@ testilogit = {};
     
     Pssignchart.strings = {
         style:
-            '.pssc_default {min-height: 2em; background-color: white; padding: 15px; border: 1px solid black; border-radius: 15px; box-shadow: 5px 5px 5px rgba(0,0,0,0.5); margin: 1em 0; text-align: center;'
-                +'background: rgb(254,255,232); /* Old browsers */ background: -moz-linear-gradient(top,  rgba(254,255,232,1) 0%, rgba(214,219,191,1) 100%); /* FF3.6+ */'
+            '.pssc_default {min-height: 2em; background-color: white; padding: 15px; border: 1px solid black; border-radius: 15px; box-shadow: 5px 5px 5px rgba(0,0,0,0.5); margin: 1em 0; text-align: center;}'
+            +'.pssc_default {background: rgb(254,255,232); /* Old browsers */ background: -moz-linear-gradient(top,  rgba(254,255,232,1) 0%, rgba(214,219,191,1) 100%); /* FF3.6+ */'
                 +'background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(254,255,232,1)), color-stop(100%,rgba(214,219,191,1))); /* Chrome,Safari4+ */'
                 +'background: -webkit-linear-gradient(top,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* Chrome10+,Safari5.1+ */'
                 +'background: -o-linear-gradient(top,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* Opera 11.10+ */'
@@ -495,13 +534,13 @@ testilogit = {};
             +'.pssc_tablewrapper {margin: 0 auto; padding-top: 1.5em; position: relative; display: inline-block; text-align: left;}'
             +'.pssc_rootlabel {position: absolute; top: 0; width: auto; overflow: visible; text-align: center; height: 0.5em; white-space: nowrap;}'
             +'.pssc_rootlabel > span.mathquill {display: inline-block; position: relative; left: -50%; margin-top: -1em; vertical-align: middle; white-space: nowrap;}'
-            +'table.pssc_table td.pssc_isroot {border-right: 2px solid black;}'
+            +'table.pssc_table td.pssc_isroot {border-right: 3px solid black;}'
             +'table.pssc_table td {min-width: 3em; border-right: 1px dotted black; padding: 0;}'
             +'table.pssc_table td.pssc_func {padding: 0 1em; border-right: none;}'
             +'table.pssc_table td.pssc_motivation {padding: 0 1em; border-right: 1px solid black; cursor: pointer; padding: 0;}'
             +'table.pssc_table td.pssc_motivation a span {width: 30px; height: 20px; display: block; margin: 0 auto;}'
             +'table.pssc_table td.pssc_motivation a {text-align: center; display: block; border: 1px solid #777; border-radius: 4px; margin: 2px;}'
-            +'.pssc_default, table.pssc_table td.pssc_motivation a, .pssignchart .pssc_toolbar li a, .pssignchart .pssc_addfuncbutton {'
+            +'.pssc_default, table.pssc_table td.pssc_motivation a, .pssignchart .pssc_toolbar li a, .pssignchart .pssc_addfuncbutton, .pssc_bggrad  {'
                 +'background: rgb(255,255,255); /* Old browsers */'
                 +'background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%); /* FF3.6+ */'
                 +'background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(47%,rgba(246,246,246,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */'
@@ -561,21 +600,26 @@ testilogit = {};
             +'.pssc_default table.pssc_table tbody.pssc_intervals td.pssc_interval span a.pssc_rootpoint[pointtype="closed"] {border: 1px solid red; background-color: red;}'
             +'.pssc_default table.pssc_table tbody.pssc_intervals td.pssc_interval span a.pssc_intervalline {display: block; height: 4px; position: absolute; left: 0; right: 0; bottom: -3px;}'
             +'.pssc_default table.pssc_table tbody.pssc_intervals td.pssc_interval span a.pssc_intervalline[intervaltype="inside"] {border-bottom: 4px solid red;}'
-            +'.pssignchart .pssc_toolbarwrapper {text-align: left; margin: 0 2em; position: relative; min-height: 4em;}'
+            +'.pssignchart .pssc_toolbarwrapper {text-align: left; margin: 0; position: relative;}'
             +'.pssignchart ul.pssc_toolbar {list-style: none; margin: 0; padding: 0; float:left;}'
             +'.pssignchart ul.pssc_toolbar li {margin: 0 0.3em; padding: 0; display: inline-block;}'
             +'.pssignchart ul.pssc_toolbar li a {display: block; border: 1px solid #777; border-radius: 4px; height: 20px; width: 20px;}'
             +'.pssignchart ul.pssc_toolbar li a.isopen {border-color: red;}'
-            +'.pssignchart .pssc_toolbarwrapper .pssc_addrowbox {margin-bottom: 0; margin-left: 60px; vertical-align: top;}'
+            +'.pssignchart .pssc_toolbarwrapper .pssc_addrowbox {position: absolute; border: 1px solid black; border-radius: 0.5em; box-shadow: 4px 4px 4px rgba(0,0,0,0.5); padding: 0.5em; z-index: 10; background-color: #fefefe; margin-bottom: 0; margin-left: 60px; vertical-align: top;}'
             // +'.pssignchart .pssc_toolbarwrapper .pssc_addrowbox {position: absolute; left: 4em; right: 4em; bottom: 3em;'
                 // +'height: 4em; border: 1px solid #777; border-bottom: none; border-radius: 1em 1em 0 0; background-color: white;}'
             +'.pssignchart .pssc_toolbarwrapper .pssc_newfunc {display: inline-block; min-width: 5em; min-height: 1.3em; margin: 0 1em;}'
             +'.pssignchart .pssc_toolbarwrapper .pssc_newroots, .pssignchart .pssc_toolbarwrapper .pssc_newroot1, .pssignchart .pssc_toolbarwrapper .pssc_newroot2 {display: inline-block; min-width: 4em; min-height: 1.3em; margin: 0 0.5em;}'
+            +'.pssignchart .pssc_toolbarwrapper .pssc_newroots[roots="0"] .pssc_newroot1, .pssignchart .pssc_toolbarwrapper .pssc_newroots[roots="0"] .pssc_newroot2, .pssignchart .pssc_toolbarwrapper .pssc_newroots[roots="1"] .pssc_newroot2 {display: none;}'
             +'.pssignchart .pssc_addfuncbutton {border: 1px solid #777; border-radius: 4px; text-decoration: none; font-weight: bold; display: inline-block; text-align: center; width: 1.5em; height: 1.5em; padding: 0; margin: 0.2em; vertical-align: top;}'
             +'.pssignchart .inputerror {background-color: #faa;}'
+            +'.pssignchart span.mathquill-editable {background-color: white;}'
     }
     
-    
+
+    /******************************************
+     * Row of signchart
+     ******************************************/
     var PsscRow = function(options){
         options = $.extend({
             func: '',
@@ -647,7 +691,10 @@ testilogit = {};
     }
     
 
-
+    
+    /*******************************************
+     * Root on a row of signchart
+     *******************************************/
     var PsscRoot = function(options){
         this.label = options.label;
         this.value = options.value;
