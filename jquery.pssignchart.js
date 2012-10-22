@@ -133,7 +133,7 @@ testilogit = {};
         if (this.mode === 'edit'){
             $tbody.find('tr.pssc_total td span.mathquill').addClass('mathquill-editable');
         }
-        this.place.find('.mathquill-editable').mathquill('editable');
+        this.place.find('.mathquill-editable:not(.mathquill-rendered-math)').mathquill('editable');
         this.place.find('.mathquill:not(.mathquill-rendered-math)').mathquill();
 
         // Add intervals
@@ -230,6 +230,7 @@ testilogit = {};
             var height=$thistd.eq(0).height();
             $(this).toggleClass('isundefined').css({'height': height + 'px', 'top': -9-(height/2)+'px'});
             signchart.undefinedpoint[index] = $(this).hasClass('isundefined');
+            signchart.changed();
             return false;
         });
         
@@ -242,18 +243,15 @@ testilogit = {};
             switch (pointtype){
                 case 'open':
                     $(this).attr('pointtype','closed');
-                    signchart.rootpoints[rootindex] = 'closed';
-                    // alert(rootindex +': closed');
+                    signchart.setRootpoint(rootindex, 'closed');
                     break;
                 case 'closed':
                     $(this).attr('pointtype','');
-                    signchart.rootpoints[rootindex] = '';
-                    // alert(rootindex +': ');
+                    signchart.setRootpoint(rootindex, '');
                     break;
                 default:
                     $(this).attr('pointtype','open');
-                    signchart.rootpoints[rootindex] = 'open';
-                    // alert(rootindex +': open');
+                    signchart.setRootpoint(rootindex, 'open');
             }
         });
         
@@ -266,19 +264,18 @@ testilogit = {};
             switch (intervaltype){
                 case 'inside':
                     $(this).attr('intervaltype','');
-                    signchart.intervals[intindex] = '';
-                    // alert(intindex+': ');
+                    signchart.setInterval(intindex, '');
                     break;
                 default:
                     $(this).attr('intervaltype','inside');
-                    signchart.intervals[intindex] = 'inside';
-                    // alert(intindex+': inside');
+                    signchart.setInterval(intindex, 'inside');
             }
         });
         
         // Init focusout for function on total row.
         this.place.find('tbody.pssc_body tr.pssc_total td.pssc_total span.mathquill-editable').focusout(function(){
             signchart.total.func = $(this).mathquill('latex');
+            signchart.changed();
         });
     }
     
@@ -298,7 +295,7 @@ testilogit = {};
                 signchart.toolbar.append('<div class="pssc_addrowbox pssc_bggrad">'
                     +'<span class="pssc_newfunc_title">f:</span><span class="mathquill-editable pssc_newfunc"></span>'
                     +'<div class="pssc_newroots" roots="0"><a href="javascript:;" class="pssc_newroots_title pssc_bggrad">0</a><span class="mathquill-editable pssc_newroot1"></span><span class="mathquill-editable pssc_newroot2"></span></div><a href="javascript:;" class="pssc_addfuncbutton">+</a></div>');
-                signchart.toolbar.find('.pssc_addrowbox').hide().fadeIn(300, function(){$(this).find('.mathquill-editable').mathquill('editable').eq(0).focus();});
+                signchart.toolbar.find('.pssc_addrowbox').hide().fadeIn(300, function(){$(this).find('.mathquill-editable:not(.mathquill-rendered-math)').mathquill('editable').eq(0).focus();});
                 signchart.toolbar.find('.pssc_addrowbox .pssc_newroots_title').click(function(){
                     var $newroots = $(this).parents('.pssc_newroots');
                     var amount = parseInt($newroots.attr('roots'));
@@ -328,7 +325,7 @@ testilogit = {};
                     }
                     if (rootsok){
                         signchart.place.trigger('add', {func: newfunc, roots: rootlist});
-                        signchart.toolbar.find('.pssc_newfunc').mathquill('latex','');
+                        signchart.toolbar.find('.pssc_newfunc').mathquill('latex','').focus();
                         signchart.toolbar.find('.pssc_newroot1').mathquill('latex','');
                         signchart.toolbar.find('.pssc_newroot2').mathquill('latex','');
                     }
@@ -413,6 +410,7 @@ testilogit = {};
         if (!nodraw){
             this.draw();
         }
+        this.changed();
         return this;
     }
     
@@ -421,6 +419,7 @@ testilogit = {};
         this.rows.splice(index, 1);
         this.refreshRoots();
         this.draw();
+        this.changed();
     }
     
     Pssignchart.prototype.refreshRoots = function(){
@@ -443,6 +442,7 @@ testilogit = {};
         if (!nodraw){
             this.draw();
         }
+        this.changed();
         return this;
     }
     
@@ -458,6 +458,7 @@ testilogit = {};
         var mot = Pssignchart.mot.indexOf(motstring);
         mot = (mot > -1) ? mot : 0;
         this.setMot(row, mot);
+        this.changed();
     }
     
     Pssignchart.prototype.getMotString = function(row){
@@ -466,6 +467,7 @@ testilogit = {};
     
     Pssignchart.prototype.setSign = function(row, col, sign){
         this.rows[row].setSign(col, sign);
+        this.changed();
     }
     
     Pssignchart.prototype.getSign = function(row, col){
@@ -474,6 +476,7 @@ testilogit = {};
     
     Pssignchart.prototype.setTotalSign = function(col, sign){
         this.total.signs[col] = sign;
+        this.changed();
     }
     
     Pssignchart.prototype.getTotalSign = function(col){
@@ -481,7 +484,9 @@ testilogit = {};
     }
     
     Pssignchart.prototype.setInterval = function(n, onoff){
-        return this.intervals[n] = onoff;
+        this.intervals[n] = onoff;
+        this.changed();
+        return this.intervals[n];
     }
     
     Pssignchart.prototype.getInterval = function(n){
@@ -489,7 +494,9 @@ testilogit = {};
     }
     
     Pssignchart.prototype.setRootpoint = function(n, onoff){
-        return this.rootpoints[n] = onoff;
+        this.rootpoints[n] = onoff;
+        this.changed();
+        return this.rootpoints[n];
     }
     
     Pssignchart.prototype.getRootpoint = function(n){
