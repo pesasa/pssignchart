@@ -11,11 +11,15 @@
         <script type="text/javascript">
             jQuery(function(){
                 jQuery('.pssc1').pssignchart({mode: 'edit'});
-                jQuery('.pssc1').pssignchart('add', {func: '2x-3', roots:[{label:'\\frac{3}{2}', value:1.5}]});
+//                jQuery('.pssc1').pssignchart('add', {func: '2x-3', roots:[{label:'\\frac{3}{2}', value:1.5}]});
                 jQuery('.pssc1').pssignchart('add', {func: 'x^2', roots:[{label:'0', value:0}]});
                 jQuery('.pssc1').pssignchart('add', {func: 'x-2', roots: [2]});
                 jQuery('.pssc1').pssignchart('add', {func: 'x^2-1', roots: [-1, 1]});
                 jQuery('.pssc1').pssignchart('total', {func: '\\frac{\\left(x^2\\right)\\left(x-2\\right)}{x^2-1}'});
+                jQuery('.pssc2').pssignchart({mode: 'edit'});
+                jQuery('.pssc3').pssignchart();
+                jQuery('.pssc3').pssignchart('set', {"rows":[{"func":"x^2","roots":[{"label":"0","value":0}],"motivation":4,"signs":["plus","plus"]},{"func":"x-2","roots":[{"label":"2","value":2}],"motivation":1,"signs":["minus","plus"]},{"func":"x^2-1","roots":[{"label":"-1","value":-1},{"label":"1","value":1}],"motivation":5,"signs":["plus","minus","plus"]}],"total":{"func":"\\frac{\\left(x^2\\right)\\left(x-2\\right)}{x^2-1}","signs":["minus","plus","plus","minus","plus"]},"intervals":[null,"inside","inside",null,"inside"],"rootpoints":["open",null,"open","closed"],"undefinedpoint":[true, false, true, false]}
+);
             });
         </script>
     </head>
@@ -28,16 +32,30 @@
 &lt;div class="pssc1"&gt;
 &lt;/div&gt;
 &lt;script type="text/javascript"&gt;
-    jQuery('.pssc1').psnumberline();
+    jQuery('.pssc1').pssignchart({mode: 'edit'});
     jQuery('.pssc1').pssignchart('add', {func: '2x-3', roots:[{label:'\\frac{3}{2}', value:1.5}]});
     jQuery('.pssc1').pssignchart('add', {func: 'x^2', roots:[0]});
     jQuery('.pssc1').pssignchart('add', {func: 'x-2', roots: [2]});
     jQuery('.pssc1').pssignchart('add', {func: 'x^2-1', roots: [-1, 1]});
     jQuery('.pssc1').pssignchart('total', {func: '\\frac{\\left(x^2\\right)\\left(x-2\\right)}{x^2-1}'});
+    jQuery('.pssc2').pssignchart({mode: 'edit'});
+    jQuery('.pssc3').pssignchart();
+    jQuery('.pssc3').pssignchart('set', {
+        "rows":[
+            {"func":"x^2","roots":[{"label":"0","value":0}],"motivation":4,"signs":["plus","plus"]},
+            {"func":"x-2","roots":[{"label":"2","value":2}],"motivation":1,"signs":["minus","plus"]},
+            {"func":"x^2-1","roots":[{"label":"-1","value":-1},{"label":"1","value":1}],"motivation":5,"signs":["plus","minus","plus"]}
+        ],
+        "total":{"func":"\\frac{\\left(x^2\\right)\\left(x-2\\right)}{x^2-1}","signs":["minus","plus","plus","minus","plus"]},
+        "intervals":[null,"inside","inside",null,"inside"],
+        "rootpoints":["open",null,"open","closed"],
+        "undefinedpoint":[]
+    });
 &lt;/script&gt;
 </div>
             <div class="pssc1"></div>
-            <div class="pssc1" style="width: 500px;margin: 0 auto;"></div>
+            <div class="pssc2"></div>
+            <div class="pssc3"></div>
         </div>
     </body>
 </html>

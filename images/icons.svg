@@ -20,6 +20,30 @@
      id="defs4">
     <linearGradient
        inkscape:collect="always"
+       id="linearGradient3112">
+      <stop
+         style="stop-color:#89a02c;stop-opacity:1;"
+         offset="0"
+         id="stop3114" />
+      <stop
+         style="stop-color:#445016;stop-opacity:1"
+         offset="1"
+         id="stop3116" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3103">
+      <stop
+         style="stop-color:#d40000;stop-opacity:1;"
+         offset="0"
+         id="stop3105" />
+      <stop
+         style="stop-color:#aa0000;stop-opacity:1"
+         offset="1"
+         id="stop3107" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
        id="linearGradient3757">
       <stop
          style="stop-color:#ececec;stop-opacity:1"
@@ -39,6 +63,33 @@
        x2="10"
        y2="20"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3103"
+       id="linearGradient3109"
+       x1="554.17786"
+       y1="-105"
+       x2="560.46497"
+       y2="-105"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3112"
+       id="linearGradient3118"
+       x1="75"
+       y1="95"
+       x2="75"
+       y2="115"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3103"
+       id="linearGradient3138"
+       gradientUnits="userSpaceOnUse"
+       x1="554.17786"
+       y1="-105"
+       x2="560.46497"
+       y2="-105" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -47,9 +98,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="4.2190705"
-     inkscape:cx="141.75339"
-     inkscape:cy="621.37288"
+     inkscape:zoom="11.933333"
+     inkscape:cx="89.362417"
+     inkscape:cy="493.97609"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -752,6 +803,88 @@
          d="m 164.69295,466.84262 a 0.58004475,0.58004475 0 0 0 0.12019,1.15384 l 3.84616,0 a 0.57698069,0.57698069 0 1 0 0,-1.15384 l -3.84616,0 a 0.57698069,0.57698069 0 0 0 -0.12019,0 z"
          id="path3149"
          inkscape:connector-curvature="0" />
+    </g>
+    <rect
+       style="fill:#ffff00;fill-opacity:1;stroke:none"
+       id="rect3093"
+       width="30"
+       height="20"
+       x="0"
+       y="100"
+       transform="translate(0,452.36218)"
+       inkscape:export-filename="/home/pesasa/gitrepos/github/pssignchart/images/zigzag.png"
+       inkscape:export-xdpi="27"
+       inkscape:export-ydpi="27" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 0,90 30,100 0,110 30,120 0,130"
+       id="path3091"
+       inkscape:connector-curvature="0"
+       transform="translate(0,452.36218)"
+       sodipodi:nodetypes="ccccc" />
+    <g
+       id="g3128"
+       inkscape:export-filename="/home/pesasa/gitrepos/github/pssignchart/images/plus.png"
+       inkscape:export-xdpi="60"
+       inkscape:export-ydpi="60">
+      <rect
+         transform="translate(0,452.36218)"
+         y="90"
+         x="60"
+         height="30"
+         width="30"
+         id="rect3120"
+         style="fill:none;fill-opacity:1;stroke:none" />
+      <path
+         id="rect3095"
+         transform="translate(0,452.36218)"
+         d="M 74.09375 95 C 72.747837 95 71.6875 96.091587 71.6875 97.4375 L 71.6875 101.6875 L 67.4375 101.6875 C 66.091587 101.6875 65 102.74784 65 104.09375 L 65 105.90625 C 65 107.25216 66.091587 108.3125 67.4375 108.3125 L 71.6875 108.3125 L 71.6875 112.5625 C 71.6875 113.90841 72.747837 115 74.09375 115 L 75.90625 115 C 77.252163 115 78.3125 113.90841 78.3125 112.5625 L 78.3125 108.3125 L 82.5625 108.3125 C 83.908413 108.3125 85 107.25216 85 105.90625 L 85 104.09375 C 85 102.74784 83.908413 101.6875 82.5625 101.6875 L 78.3125 101.6875 L 78.3125 97.4375 C 78.3125 96.091587 77.252163 95 75.90625 95 L 74.09375 95 z "
+         style="fill:url(#linearGradient3118);fill-opacity:1;stroke:none" />
+    </g>
+    <g
+       id="g3124"
+       inkscape:export-filename="/home/pesasa/gitrepos/github/pssignchart/images/minus.png"
+       inkscape:export-xdpi="60"
+       inkscape:export-ydpi="60">
+      <rect
+         style="fill:none;fill-opacity:1;stroke:none"
+         id="rect3122"
+         width="30"
+         height="30"
+         x="90"
+         y="542.36218" />
+      <rect
+         ry="2.429445"
+         y="-115"
+         x="554.03815"
+         height="20"
+         width="6.6480446"
+         id="rect3101"
+         style="fill:url(#linearGradient3109);fill-opacity:1;stroke:none"
+         transform="matrix(0,1,-1,0,0,0)" />
+    </g>
+    <g
+       inkscape:export-ydpi="45"
+       inkscape:export-xdpi="45"
+       inkscape:export-filename="/home/pesasa/gitrepos/github/pssignchart/images/minus_small.png"
+       id="g3132"
+       transform="translate(30,0)">
+      <rect
+         y="542.36218"
+         x="90"
+         height="30"
+         width="30"
+         id="rect3134"
+         style="fill:none;stroke:none" />
+      <rect
+         transform="matrix(0,1,-1,0,0,0)"
+         style="fill:url(#linearGradient3138);fill-opacity:1;stroke:none"
+         id="rect3136"
+         width="6.6480446"
+         height="20"
+         x="554.03815"
+         y="-115"
+         ry="2.429445" />
     </g>
   </g>
 </svg>
