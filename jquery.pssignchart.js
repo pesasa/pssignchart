@@ -80,7 +80,7 @@ testilogit = {};
             this.width = this.settings.width;
         }
         this.place.addClass('pssc_rendered').addClass(this.settings.theme);
-        var $schart = $('<div class="pssc_tablewrapper"><table class="pssc_table"><tbody class="pssc_body"></tbody><tbody class="pssc_intervals"><tr></tr></tbody></table></div>');
+        var $schart = $('<div class="pssc_tablewrapper"><table class="pssc_table"><thead class="pssc_head"><tr><td colspan="2"><div></div></td></tr></thead><tbody class="pssc_body"></tbody><tbody class="pssc_intervals"><tr></tr></tbody></table></div>');
         this.schartnumber = -1;
         while ($('#signchart_'+(++this.schartnumber)).length > 0){};
         $schart.attr('id','#signchart_'+this.schartnumber)
@@ -99,6 +99,7 @@ testilogit = {};
     Pssignchart.prototype.draw = function(){
         // Draw the signchart
         var signchart = this;
+        var $thead = this.place.find('thead.pssc_head');
         var $tbody = this.place.find('tbody.pssc_body');
         $tbody.empty();
         // Draw each function row.
@@ -148,14 +149,10 @@ testilogit = {};
         this.place.find('table.pssc_table tbody.pssc_intervals tr').html(intervalhtml);
 
         // Add labels for roots.
-        var $schart = this.place.find('.pssc_tablewrapper');
-        $schart.find('.pssc_rootlabel').remove();
-        var $tdelem = $tbody.find('tr:eq(0) td:eq(0)');
-        var xpos = $tdelem.outerWidth() + $tdelem.next().outerWidth();
+        $thead.empty().append('<tr><td colspan="2"><div></div></td></tr>');
+        $thtr = $thead.find('tr');
         for (var i = 0; i < this.roots.length; i++){
-            $tdelem = $tdelem.next('td');
-            xpos = xpos + $tdelem.outerWidth();
-            $schart.append('<div class="pssc_rootlabel" style="left:'+xpos+'px;"><span class="mathquill">'+this.roots[i].label+'</span></div>');
+            $thtr.append('<td class="pssc_headrootlabel"><div class="pssc_rootlabel"><span class="mathquill">'+this.roots[i].label+'</span></div></td>');
         }
         this.place.find('.mathquill:not(.mathquill-rendered-math)').mathquill();
 
@@ -229,8 +226,7 @@ testilogit = {};
             var index = $thistd.parent('tr').find('td').index($thistd) -1;
             var height=$thistd.eq(0).height();
             $(this).toggleClass('isundefined').css({'height': height + 'px', 'top': -9-(height/2)+'px'});
-            signchart.undefinedpoint[index] = $(this).hasClass('isundefined');
-            signchart.changed();
+            signchart.setUndef(index ,$(this).hasClass('isundefined'));
             return false;
         });
         
@@ -437,7 +433,7 @@ testilogit = {};
     
     Pssignchart.prototype.addTotal = function(options, nodraw){
         options.func = options.func || '';
-        options.signs = options.signs || [];
+        options.signs = options.signs || this.total.signs || [];
         this.total = {func: options.func, signs: options.signs};
         if (!nodraw){
             this.draw();
@@ -466,6 +462,9 @@ testilogit = {};
     }
     
     Pssignchart.prototype.setSign = function(row, col, sign){
+        if (sign !== 'plus' && sign !== 'minus'){
+            return false;
+        }
         this.rows[row].setSign(col, sign);
         this.changed();
     }
@@ -484,6 +483,10 @@ testilogit = {};
     }
     
     Pssignchart.prototype.setInterval = function(n, onoff){
+        onoff = (onoff ? 'inside':'');
+        if (n < 0 || n > this.roots.length -1){
+            return false;
+        }
         this.intervals[n] = onoff;
         this.changed();
         return this.intervals[n];
@@ -494,6 +497,9 @@ testilogit = {};
     }
     
     Pssignchart.prototype.setRootpoint = function(n, onoff){
+        if (n < 0 || n > this.roots.length -1 || (onoff !== 'closed' && onoff !== 'open' && onoff !== '')){
+            return false;
+        }
         this.rootpoints[n] = onoff;
         this.changed();
         return this.rootpoints[n];
@@ -501,6 +507,19 @@ testilogit = {};
     
     Pssignchart.prototype.getRootpoint = function(n){
         return this.rootpoints[n] || '';
+    }
+    
+    Pssignchart.prototype.setUndef = function(index, onoff){
+        if (index < 0 || index > this.roots.length -1){
+            return false;
+        }
+        this.undefinedpoint[index] = onoff;
+        this.changed();
+        return this.undefinedpoint[index];
+    }
+    
+    Pssignchart.prototype.getUndef = function(index){
+        return this.undefinedpoint[index] || '';
     }
     
     Pssignchart.prototype.getData = function(options){
@@ -553,6 +572,36 @@ testilogit = {};
             schart.addTotal(options);
         });
 
+        this.place.bind('setsign', function(e, options){
+            schart.setSign(options.row, options.col, options.sign);
+            schart.draw();
+        });
+
+        this.place.bind('settotsign', function(e, options){
+            schart.setTotalSign(options.col, options.sign);
+            schart.draw();
+        });
+
+        this.place.bind('setinterval', function(e, options){
+            schart.setInterval(options.col, options.onoff);
+            schart.draw();
+        });
+
+        this.place.bind('setrootpoint', function(e, options){
+            schart.setRootpoint(options.col, options.onoff);
+            schart.draw();
+        });
+
+        this.place.bind('setundef', function(e, options){
+            schart.setUndef(options.col, options.onoff);
+            schart.draw();
+        });
+
+        this.place.bind('setmot', function(e, options){
+            schart.setMotString(options.row, options.mot);
+            schart.draw();
+        });
+
         this.place.bind('get', function(e, options){
             return schart.getData(options);
         });
@@ -594,21 +643,24 @@ testilogit = {};
             +'.pssignchart .pssc_tablewrapper {clear: both;}'
             +'.pssc_default table.pssc_table {border-collapse: collapse; margin: 0.2em auto;}'
             +'.pssignchartwrapper {text-align: center;}'
-            +'.pssignchart {position: relative; display: inline-block; text-align: left;}'
+            +'.pssignchart {position: relative; display: inline-block; text-align: left; min-height: 70px;}'
             +'.pssignchart.editmode {margin-bottom: 2em; padding-left: 70px;}'
             +'.pssc_default table.pssc_table tbody.pssc_body {border: 1px solid black;}'
             +'table.pssc_table tr:nth-child(even) td {background-color: #eef;/*#dfb;*/}'
             +'table.pssc_table tr:nth-child(odd) td {background-color: white;}'
             +'table.pssc_table tr.pssc_total {border-top: 4px solid black;}'
-            +'.pssc_tablewrapper {margin: 0 auto; padding-top: 1.5em; position: relative; display: inline-block; text-align: left;}'
-            +'.pssc_rootlabel {position: absolute; top: 0; width: auto; overflow: visible; text-align: center; height: 0.5em; white-space: nowrap;}'
-            +'.pssc_rootlabel > span.mathquill {display: inline-block; position: relative; left: -50%; margin-top: -1em; vertical-align: middle; white-space: nowrap;}'
-            +'table.pssc_table td.pssc_isroot {border-right: 3px solid black;}'
-            +'table.pssc_table td {min-width: 3em; border-right: 1px dotted black; padding: 0;}'
-            +'table.pssc_table td.pssc_func {padding: 0 1em; border-right: none;}'
-            +'table.pssc_table td.pssc_motivation {padding: 0 1em; border-right: 1px solid black; cursor: pointer; padding: 0;}'
-            +'table.pssc_table td.pssc_motivation a span {width: 30px; height: 20px; display: block; margin: 0 auto;}'
-            +'table.pssc_table td.pssc_motivation a {text-align: center; display: block; border: 1px solid #777; border-radius: 4px; margin: 2px;}'
+            +'.pssc_tablewrapper {margin: 0 auto; position: relative; display: inline-block; text-align: left;}'
+            +'table.pssc_table .pssc_head td div {min-height: 1em;}'
+            +'td.pssc_headrootlabel {text-align: right;}'
+            +'td.pssc_headrootlabel .pssc_rootlabel {text-align: left; display: inline-block;}'
+            +'.pssc_rootlabel {position: relative; overflow: visible; text-align: center; white-space: nowrap; padding-bottom: 0.5em;}'
+            +'.pssc_rootlabel > span.mathquill {display: inline-block; position: relative; right: -50%; margin-top: -1em; vertical-align: bottom; white-space: nowrap;}'
+            +'table.pssc_table .pssc_body td.pssc_isroot {border-right: 3px solid black;}'
+            +'table.pssc_table .pssc_body td {min-width: 3em; border-right: 1px dotted black; padding: 0;}'
+            +'table.pssc_table .pssc_body td.pssc_func {padding: 0 1em; border-right: none;}'
+            +'table.pssc_table .pssc_body td.pssc_motivation {padding: 0 1em; border-right: 1px solid black; cursor: pointer; padding: 0;}'
+            +'table.pssc_table .pssc_body td.pssc_motivation a span {width: 30px; height: 20px; display: block; margin: 0 auto;}'
+            +'table.pssc_table .pssc_body td.pssc_motivation a {text-align: center; display: block; border: 1px solid #777; border-radius: 4px; margin: 0;}'
             +'.pssc_default, table.pssc_table td.pssc_motivation a, .pssignchart .pssc_toolbar li a, .pssignchart .pssc_addfuncbutton, .pssc_bggrad  {'
                 +'background: rgb(255,255,255); /* Old browsers */'
                 +'background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%); /* FF3.6+ */'
