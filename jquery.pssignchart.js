@@ -58,7 +58,7 @@ testilogit = {};
         this.place.addClass('pssignchart');
         this.rows = [];
         this.roots = [];
-        this.total = {func: '', signs: ['']};
+        this.total = {func: '', signs: [''], relation: '<'};
         this.intervals = [];
         this.rootpoints = [];
         this.undefinedpoint = [];
@@ -120,33 +120,39 @@ testilogit = {};
             $trow.append('<td class="pssc_sign" sign="'+this.getSign(i, rowroot)+'" rootnum="'+rowroot+'"><a href="javascript:;"></a></td>');
             $tbody.append($trow);
         }
-        // Draw the total row.
-        var $trow = $('<tr class="pssc_total"></tr>');
-        $trow.append('<td colspan="2" class="pssc_total"><span class="mathquill">'+this.total.func+'</span></td>');
-        for (var j = 0; j < this.roots.length; j++){
-            var thisundefined = (this.undefinedpoint[j] ? ' isundefined': '');
-            $trow.append('<td class="pssc_sign" sign="'+this.getTotalSign(j)+'" rootnum="'+j+'"><div class="pssc_totalwrapper"><a href="javascript:;" class="pssc_totalsign"></a><a href="javascript:;" class="pssc_totalundefined'+thisundefined+'"></a></div></td>');
-        }
-        $trow.append('<td class="pssc_sign" sign="'+this.getTotalSign(this.roots.length)+'" rootnum="'+this.roots.length+'"><a href="javascript:;" class="pssc_totalsign"></a></td>');
+        if (this.rows.length > 1){
+            // Draw the total row.
+            var $trow = $('<tr class="pssc_total"></tr>');
+            $trow.append('<td colspan="2" class="pssc_total"><span class="mathquill">'+this.total.func+'</span></td>');
+            for (var j = 0; j < this.roots.length; j++){
+                var thisundefined = (this.undefinedpoint[j] ? ' isundefined': '');
+                $trow.append('<td class="pssc_sign" sign="'+this.getTotalSign(j)+'" rootnum="'+j+'"><div class="pssc_totalwrapper"><a href="javascript:;" class="pssc_totalsign"></a><a href="javascript:;" class="pssc_totalundefined'+thisundefined+'"></a></div></td>');
+            }
+            $trow.append('<td class="pssc_sign" sign="'+this.getTotalSign(this.roots.length)+'" rootnum="'+this.roots.length+'"><a href="javascript:;" class="pssc_totalsign"></a></td>');
 
-        $tbody.append($trow);
-        // Function on total row is editable, if in edit-mode.
-        if (this.mode === 'edit'){
-            $tbody.find('tr.pssc_total td span.mathquill').addClass('mathquill-editable');
+            $tbody.append($trow);
+            // Function on total row is editable, if in edit-mode.
+            if (this.mode === 'edit'){
+                $tbody.find('tr.pssc_total td span.mathquill').addClass('mathquill-editable');
+            }
+            this.place.find('.mathquill-editable:not(.mathquill-rendered-math)').mathquill('editable');
+            this.place.find('.mathquill:not(.mathquill-rendered-math)').mathquill();
         }
-        this.place.find('.mathquill-editable:not(.mathquill-rendered-math)').mathquill('editable');
-        this.place.find('.mathquill:not(.mathquill-rendered-math)').mathquill();
 
-        // Add intervals
-        var intervalhtml = '<td colspan="2"></td>';
-        for (var i = 0; i < this.roots.length; i++){
+        if (this.rows.length > 0){
+            // Add intervals
+            var lefthandside = (this.rows.length === 1 ? this.rows[0].func : this.total.func);
+            var intervalhtml = '<td colspan="2"><div class="pssc_inequality"><a href="javascript:;" class="pssc_ineqlink"><span class="pssc_ineq">'+ lefthandside + this.getTotalRelation() +'0</span></a></div></td>';
+            for (var i = 0; i < this.roots.length; i++){
+                intervalhtml += '<td class="pssc_interval"><span><a href="javascript:;" class="pssc_intervalline" intervaltype="'
+                    +this.getInterval(i)+'"></a><a href="javascript:;" class="pssc_rootpoint" pointtype="'
+                    +this.getRootpoint(i)+'"></a></span></td>';
+            }
             intervalhtml += '<td class="pssc_interval"><span><a href="javascript:;" class="pssc_intervalline" intervaltype="'
-                +this.getInterval(i)+'"></a><a href="javascript:;" class="pssc_rootpoint" pointtype="'
-                +this.getRootpoint(i)+'"></a></span></td>';
+                +this.getInterval(this.roots.length)+'"></a></span></td>';
+            this.place.find('table.pssc_table tbody.pssc_intervals tr').html(intervalhtml)
+                .find('.pssc_ineq').mathquill('embedded-latex');
         }
-        intervalhtml += '<td class="pssc_interval"><span><a href="javascript:;" class="pssc_intervalline" intervaltype="'
-            +this.getInterval(this.roots.length)+'"></a></span></td>';
-        this.place.find('table.pssc_table tbody.pssc_intervals tr').html(intervalhtml);
 
         // Add labels for roots.
         $thead.empty().append('<tr><td colspan="2"><div></div></td></tr>');
@@ -270,7 +276,16 @@ testilogit = {};
         
         // Init focusout for function on total row.
         this.place.find('tbody.pssc_body tr.pssc_total td.pssc_total span.mathquill-editable').focusout(function(){
-            signchart.total.func = $(this).mathquill('latex');
+            var latex = $(this).mathquill('latex');
+            signchart.total.func = latex;
+            signchart.place.find('.pssc_ineq').mathquill('latex', latex + signchart.getTotalRelation() + '0');
+            signchart.changed();
+        });
+        
+        // Init click to change relation of inequality.
+        this.place.find('tbody.pssc_intervals a.pssc_ineqlink').click(function(){
+            signchart.nextTotalRelation();
+            $(this).find('.pssc_ineq').mathquill('latex', signchart.total.func + signchart.getTotalRelation() + '0');
             signchart.changed();
         });
     }
@@ -434,7 +449,8 @@ testilogit = {};
     Pssignchart.prototype.addTotal = function(options, nodraw){
         options.func = options.func || '';
         options.signs = options.signs || this.total.signs || [];
-        this.total = {func: options.func, signs: options.signs};
+        options.relation = options.relation || this.total.relation || '<';
+        this.total = {func: options.func, signs: options.signs, relation: options.relation};
         if (!nodraw){
             this.draw();
         }
@@ -482,6 +498,21 @@ testilogit = {};
         return this.total.signs[col] || '';
     }
     
+    Pssignchart.prototype.setTotalRelation = function(relation){
+        this.total.relation = relation;
+        this.changed();
+    }
+    
+    Pssignchart.prototype.getTotalRelation = function(){
+        return this.total.relation || '<';
+    }
+    
+    Pssignchart.prototype.nextTotalRelation = function(){
+        var relations = ['<','>','\\leq','\\geq'];
+        this.total.relation = relations[(relations.indexOf(this.total.relation) + 1) % relations.length];
+        this.changed();
+    }
+    
     Pssignchart.prototype.setInterval = function(n, onoff){
         onoff = (onoff ? 'inside':'');
         if (n < 0 || n > this.roots.length -1){
@@ -523,12 +554,13 @@ testilogit = {};
     }
     
     Pssignchart.prototype.getData = function(options){
-        var data = {rows: [], total: {func: "", signs: []}, intervals: [], rootpoints: [], undefinedpoint: []};
+        var data = {rows: [], total: {func: "", signs: [], relation: '<'}, intervals: [], rootpoints: [], undefinedpoint: []};
         for (var i=0; i<this.rows.length; i++){
             data.rows.push(this.rows[i].getData());
         }
         data.total.func = this.total.func;
         data.total.signs = this.total.signs;
+        data.total.relation = this.total.relation;
         data.intervals = this.intervals.slice(0);
         data.rootpoints = this.rootpoints.slice(0);
         data.undefinedpoint = this.undefinedpoint.slice(0);
@@ -745,6 +777,9 @@ testilogit = {};
             +'.pssc_totalwrapper .pssc_totalundefined.isundefined {background: rgba(255,255,255,0.5) url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAGCAYAAAARx7TFAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAEJwAABCcB2U8dgAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABESURBVAiZjc6xDYBADAPAC12moqb9ghlZg2kYIzSP9AVFLFkubNmOqrIiIhIHTuy4zVBi4MIzdSC/kl9j5aaDzlx0jr/6Nimp6cXzJwAAAABJRU5ErkJggg==) center top repeat-y;}'
             +'a.pssc_removerow_button {display: block; width: 15px; height: 15px; margin-left: -40px; border: 1px solid #777; border-radius: 4px; position: absolute;}'
             +'a.pssc_removerow_button span {display: block; width: 15px; height: 15px; background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAG7AAABuwBHnU4NQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACASURBVCiR1ZIxDoJQEETfEDgB8Q7W9DRWtp6U1oqGnpo7EBssf8JYKAkEUfOtmG6SeZndzco2sUqiyf3C6dx0Uh7gsBXOoD/at8lrunYrnQzXZ2ZTQXAu7HrRPED5BXyVUwJL+A6NIfzQ3KzGBqikfPywcwL95d3OMdrpk/wFPwCoMCa9FLMcVQAAAABJRU5ErkJggg==) center center no-repeat;}'
+        +'.pssc_inequality {margin-bottom: -1em;}'
+        +'a.pssc_ineqlink {color: black; text-decoration: none;}'
+        +'a.pssc_ineqlink .pssc_ineq {cursor: pointer;}'
     }
     
 
