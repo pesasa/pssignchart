@@ -1,4 +1,8 @@
-License for jquery.pssignchart.js
+MathQuill (mathquill.js, mathquill.css, fonts)
+ is licensed under GNU LGPL.
+
+License for jquery.pssignchart.js:
+Either GNU LGPL 2.0 or later or WTFPL.
 -------------------------------------------------------------------
 
 DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
