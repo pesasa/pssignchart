@@ -58,7 +58,7 @@ testilogit = {};
         this.place.addClass('pssignchart');
         this.rows = [];
         this.roots = [];
-        this.total = {func: '', signs: [''], relation: '<'};
+        this.total = {func: '', signs: [''], relation: '\\lt'};
         this.intervals = [];
         this.rootpoints = [];
         this.undefinedpoint = [];
@@ -152,6 +152,7 @@ testilogit = {};
                 +this.getInterval(this.roots.length)+'"></a></span></td>';
             this.place.find('table.pssc_table tbody.pssc_intervals tr').html(intervalhtml)
                 .find('.pssc_ineq').mathquill('embedded-latex');
+            this.place.find('.pssc_ineq > span.binary-operator').last().addClass('pssc_ineqrelation');
         }
 
         // Add labels for roots.
@@ -278,7 +279,11 @@ testilogit = {};
         this.place.find('tbody.pssc_body tr.pssc_total td.pssc_total span.mathquill-editable').focusout(function(){
             var latex = $(this).mathquill('latex');
             signchart.total.func = latex;
-            signchart.place.find('.pssc_ineq').mathquill('latex', latex + signchart.getTotalRelation() + '0');
+//             signchart.place.find('.pssc_ineq').mathquill('latex', latex + signchart.getTotalRelation() + '0');
+            signchart.place.find('tbody.pssc_intervals a.pssc_ineqlink')
+                .html('<span class="pssc_ineq">'+latex + signchart.getTotalRelation() + '0</span>')
+                .find('.pssc_ineq').mathquill('embedded-latex');
+            signchart.place.find('.pssc_ineq > span.binary-operator').last().addClass('pssc_ineqrelation');
             signchart.changed();
         });
         
@@ -286,7 +291,10 @@ testilogit = {};
         this.place.find('tbody.pssc_intervals a.pssc_ineqlink').click(function(){
             var lefthandside = (signchart.rows.length === 1 ? signchart.rows[0].func : signchart.total.func);
             signchart.nextTotalRelation();
-            $(this).find('.pssc_ineq').mathquill('latex', lefthandside + signchart.getTotalRelation() + '0');
+//             $(this).find('.pssc_ineq').mathquill('latex', lefthandside + signchart.getTotalRelation() + '0');
+            $(this).html('<span class="pssc_ineq">'+lefthandside + signchart.getTotalRelation() + '0</span>')
+                .find('.pssc_ineq').mathquill('embedded-latex');
+            signchart.place.find('.pssc_ineq > span.binary-operator').last().addClass('pssc_ineqrelation');
             signchart.changed();
         });
     }
@@ -463,7 +471,7 @@ testilogit = {};
     Pssignchart.prototype.addTotal = function(options, nodraw){
         options.func = options.func || '';
         options.signs = options.signs || this.total.signs || [];
-        options.relation = options.relation || this.total.relation || '<';
+        options.relation = options.relation || this.total.relation || '\\lt';
         this.total = {func: options.func, signs: options.signs, relation: options.relation};
         if (!nodraw){
             this.draw();
@@ -518,11 +526,11 @@ testilogit = {};
     }
     
     Pssignchart.prototype.getTotalRelation = function(){
-        return this.total.relation || '<';
+        return this.total.relation || '\\lt';
     }
     
     Pssignchart.prototype.nextTotalRelation = function(){
-        var relations = ['<','>','\\leq','\\geq'];
+        var relations = ['\\lt','\\gt','\\leq','\\geq'];
         this.total.relation = relations[(relations.indexOf(this.total.relation) + 1) % relations.length];
         this.changed();
     }
@@ -568,7 +576,7 @@ testilogit = {};
     }
     
     Pssignchart.prototype.getData = function(options){
-        var data = {rows: [], total: {func: "", signs: [], relation: '<'}, intervals: [], rootpoints: [], undefinedpoint: []};
+        var data = {rows: [], total: {func: "", signs: [], relation: '\\lt'}, intervals: [], rootpoints: [], undefinedpoint: []};
         for (var i=0; i<this.rows.length; i++){
             data.rows.push(this.rows[i].getData());
         }
@@ -792,8 +800,9 @@ testilogit = {};
             +'a.pssc_removerow_button {display: block; width: 15px; height: 15px; margin-left: -40px; border: 1px solid #777; border-radius: 4px; position: absolute;}'
             +'a.pssc_removerow_button span {display: block; width: 15px; height: 15px; background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAG7AAABuwBHnU4NQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACASURBVCiR1ZIxDoJQEETfEDgB8Q7W9DRWtp6U1oqGnpo7EBssf8JYKAkEUfOtmG6SeZndzco2sUqiyf3C6dx0Uh7gsBXOoD/at8lrunYrnQzXZ2ZTQXAu7HrRPED5BXyVUwJL+A6NIfzQ3KzGBqikfPywcwL95d3OMdrpk/wFPwCoMCa9FLMcVQAAAABJRU5ErkJggg==) center center no-repeat;}'
         +'.pssc_inequality {margin-bottom: -1em;}'
-        +'a.pssc_ineqlink {color: black; text-decoration: none;}'
+        +'a.pssc_ineqlink {color: black; text-decoration: none; display: inline-block;}'
         +'a.pssc_ineqlink .pssc_ineq {cursor: pointer;}'
+        +'.pssignchart.editmode .pssc_ineqrelation {color: red; font-weight: bold;}'
     }
     
 
