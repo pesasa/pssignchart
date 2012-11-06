@@ -284,8 +284,9 @@ testilogit = {};
         
         // Init click to change relation of inequality.
         this.place.find('tbody.pssc_intervals a.pssc_ineqlink').click(function(){
+            var lefthandside = (signchart.rows.length === 1 ? signchart.rows[0].func : signchart.total.func);
             signchart.nextTotalRelation();
-            $(this).find('.pssc_ineq').mathquill('latex', signchart.total.func + signchart.getTotalRelation() + '0');
+            $(this).find('.pssc_ineq').mathquill('latex', lefthandside + signchart.getTotalRelation() + '0');
             signchart.changed();
         });
     }
@@ -313,6 +314,16 @@ testilogit = {};
                     amount = (amount + 1) % 3;
                     $newroots.attr('roots', amount);
                     $(this).html(amount);
+                });
+                signchart.toolbar.find('.pssc_addrowbox').bind('keyup',function(e){
+                    var key = e.keyCode;
+                    switch (key){
+                        case 27:
+                            $tool.click();
+                            break;
+                        default:
+                            break;
+                    }
                 });
                 signchart.toolbar.find('a.pssc_addfuncbutton').click(function(){
                     var numofroots = parseInt($(this).parent().find('.pssc_newroots').attr('roots'));
@@ -361,6 +372,9 @@ testilogit = {};
                         var index = $allfunc.index($thisfunc);
                         signchart.removeFunc(index);
                         signchart.place.find('.pssc_toolbar a.removerow.isopen').click().click();
+                        if (signchart.rows.length === 0){
+                            signchart.place.find('tbody.pssc_intervals tr').remove();
+                        }
                     });
             }
         });
@@ -664,7 +678,7 @@ testilogit = {};
     
     Pssignchart.strings = {
         style:
-            '.pssc_default {min-height: 2em; background-color: white; padding: 15px; border: 1px solid black; border-radius: 15px; box-shadow: 5px 5px 5px rgba(0,0,0,0.5); margin: 1em 0; text-align: center;}'
+            '.pssc_default {min-height: 2em; background-color: white; padding: 5px 15px 15px 15px; border: 1px solid black; border-radius: 15px; box-shadow: 5px 5px 5px rgba(0,0,0,0.5); margin: 1em 0; text-align: center;}'
             +'.pssc_default {background: rgb(254,255,232); /* Old browsers */ background: -moz-linear-gradient(top,  rgba(254,255,232,1) 0%, rgba(214,219,191,1) 100%); /* FF3.6+ */'
                 +'background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(254,255,232,1)), color-stop(100%,rgba(214,219,191,1))); /* Chrome,Safari4+ */'
                 +'background: -webkit-linear-gradient(top,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* Chrome10+,Safari5.1+ */'
@@ -682,7 +696,7 @@ testilogit = {};
             +'table.pssc_table tr:nth-child(odd) td {background-color: white;}'
             +'table.pssc_table tr.pssc_total {border-top: 4px solid black;}'
             +'.pssc_tablewrapper {margin: 0 auto; position: relative; display: inline-block; text-align: left;}'
-            +'table.pssc_table .pssc_head td {color: black;}'
+            +'table.pssc_table .pssc_head td {color: black; padding-top: 0.7em;}'
             +'table.pssc_table .pssc_head td div {min-height: 1em;}'
             +'td.pssc_headrootlabel {text-align: right;}'
             +'td.pssc_headrootlabel .pssc_rootlabel {text-align: left; display: inline-block;}'
