@@ -5,7 +5,7 @@
  * pesasa@iki.fi
  * 15.08.2012
  *
- * License: WTFPL
+ * License: GNU LGPL or WTFPL
  *    http://sam.zoy.org/wtfpl/COPYING
  ********************************************************/
 
@@ -174,6 +174,23 @@ testilogit = {};
         var signchart = this;
         var $tbody = this.place.find('tbody.pssc_body');
         
+        // Init remove row.
+        $tbody.find('td.pssc_func')
+            .prepend('<a href="javascript:;" class="pssc_removerow_button pssc_bggrad"><span class="pssc_text">-</span><span class="pssc_icon"></span></a>')
+            .find('a.pssc_removerow_button')
+            .click(function(){
+                var $thisbutton = $(this);
+                var $thisfunc = $thisbutton.parents('td.pssc_func');
+                var $allfunc = $thisfunc.parents('tbody').find('td.pssc_func');
+                var index = $allfunc.index($thisfunc);
+                signchart.removeFunc(index);
+                signchart.place.find('.pssc_toolbar a.removerow.isopen').click().click();
+                if (signchart.rows.length === 0){
+                    signchart.place.find('tbody.pssc_intervals tr').empty();
+                }
+            });
+
+        
         // Init clicks for motivations.
         $tbody.find('td.pssc_motivation a').click(function(){
             var $motlink = $(this);
@@ -279,7 +296,6 @@ testilogit = {};
         this.place.find('tbody.pssc_body tr.pssc_total td.pssc_total span.mathquill-editable').focusout(function(){
             var latex = $(this).mathquill('latex');
             signchart.total.func = latex;
-//             signchart.place.find('.pssc_ineq').mathquill('latex', latex + signchart.getTotalRelation() + '0');
             signchart.place.find('tbody.pssc_intervals a.pssc_ineqlink')
                 .html('<span class="pssc_ineq">'+latex + signchart.getTotalRelation() + '0</span>')
                 .find('.pssc_ineq').mathquill('embedded-latex');
@@ -291,7 +307,6 @@ testilogit = {};
         this.place.find('tbody.pssc_intervals a.pssc_ineqlink').click(function(){
             var lefthandside = (signchart.rows.length === 1 ? signchart.rows[0].func : signchart.total.func);
             signchart.nextTotalRelation();
-//             $(this).find('.pssc_ineq').mathquill('latex', lefthandside + signchart.getTotalRelation() + '0');
             $(this).html('<span class="pssc_ineq">'+lefthandside + signchart.getTotalRelation() + '0</span>')
                 .find('.pssc_ineq').mathquill('embedded-latex');
             signchart.place.find('.pssc_ineq > span.binary-operator').last().addClass('pssc_ineqrelation');
@@ -299,7 +314,7 @@ testilogit = {};
         });
     }
     
-    Pssignchart.prototype.showEdit = function(){
+    Pssignchart.prototype.showEditOld = function(){
         // Shows buttons for adding and removing functions.
         var signchart = this;
         this.place.prepend('<div class="pssc_toolbarwrapper"><ul class="pssc_toolbar"><li><a href="javascript:;" class="addrow"><span></span></a></li><li><a href="javascript:;" class="removerow"><span></span></a></li></ul></div>');
@@ -314,7 +329,7 @@ testilogit = {};
                 $tool.addClass('isopen');
                 signchart.toolbar.append('<div class="pssc_addrowbox pssc_bggrad">'
                     +'<span class="pssc_newfunc_title">f:</span><span class="mathquill-editable pssc_newfunc"></span>'
-                    +'<div class="pssc_newroots" roots="0"><a href="javascript:;" class="pssc_newroots_title pssc_bggrad">0</a><span class="mathquill-editable pssc_newroot1"></span><span class="mathquill-editable pssc_newroot2"></span></div><a href="javascript:;" class="pssc_addfuncbutton">+</a></div>');
+                    +'<div class="pssc_newroots" roots="0"><a href="javascript:;" class="pssc_newroots_title pssc_bggrad">0</a><span class="mathquill-editable pssc_newroot1"></span><span class="mathquill-editable pssc_newroot2"></span></div><a href="javascript:;" class="pssc_addfuncbutton"><span class="pssc_text">+</span><span class="pssc_icon"></span></a></div>');
                 signchart.toolbar.find('.pssc_addrowbox').hide().fadeIn(300, function(){$(this).find('.mathquill-editable:not(.mathquill-rendered-math)').mathquill('editable').eq(0).focus();});
                 signchart.toolbar.find('.pssc_addrowbox .pssc_newroots_title').click(function(){
                     var $newroots = $(this).parents('.pssc_newroots');
@@ -387,7 +402,79 @@ testilogit = {};
             }
         });
     }
-    
+
+    Pssignchart.prototype.showEdit = function(){
+        // Shows buttons for adding and removing functions.
+        var signchart = this;
+        this.place.prepend('<div class="pssc_toolbarwrapper"></div>');
+        this.toolbar = this.place.find('.pssc_toolbarwrapper');
+        signchart.toolbar.append('<div class="pssc_addrowbox pssc_bggrad">'
+            +'<span class="pssc_newfunc_title">f:</span><span class="mathquill-editable pssc_newfunc"></span>'
+            +'<div class="pssc_newroots" roots="0"><a href="javascript:;" class="pssc_newroots_title pssc_bggrad">0</a><span class="mathquill-editable pssc_newroot1"></span><span class="mathquill-editable pssc_newroot2"></span></div><a href="javascript:;" class="pssc_addfuncbutton"><span class="pssc_text">+</span><span class="pssc_icon"></span></a></div>');
+        signchart.toolbar.find('.pssc_addrowbox')
+            .find('.mathquill-editable:not(.mathquill-rendered-math)')
+            .mathquill('editable').eq(0).focus();
+        signchart.toolbar.find('.pssc_addrowbox .pssc_newroots_title').click(function(){
+            var $newroots = $(this).parents('.pssc_newroots');
+            var amount = parseInt($newroots.attr('roots'));
+            amount = (amount + 1) % 3;
+            $newroots.attr('roots', amount);
+            $(this).html(amount);
+        });
+        signchart.toolbar.find('.pssc_addrowbox .mathquill-editable').bind('keyup.pssignchart',function(e){
+            var key = e.keyCode;
+            switch (key){
+                case 13:
+                    $(this).parents('.pssc_addrowbox').find('a.pssc_addfuncbutton').click();
+                    break;
+                default:
+                    break;
+            }
+        });
+        signchart.toolbar.find('a.pssc_addfuncbutton').click(function(){
+            var numofroots = parseInt($(this).parent().find('.pssc_newroots').attr('roots'));
+            var newfunc = signchart.toolbar.find('.pssc_newfunc').mathquill('latex');
+            var newroot = [];
+            var newrootval = [];
+            var rootsok = true;
+            var rootlist = [];
+            for (var i = 0; i < numofroots; i++){
+                newroot[i] = signchart.toolbar.find('.pssc_newroot'+(i+1)).mathquill('latex');
+                try {
+                    newrootval[i] = latexeval(newroot[i]);
+                    rootsok = rootsok && (typeof(newrootval[i]) === 'number');
+                    rootlist.push({label: newroot[i], value: newrootval[i]});
+                } catch (err){
+                    if (err === 'Invalidexpression'){
+                        signchart.toolbar.find('.pssc_newroot'+(i+1)).addClass('inputerror').focus().delay(2000).queue(function(){$(this).removeClass('inputerror');$(this).dequeue();});
+                        rootsok = false;
+                    }
+                }
+            }
+            if (rootsok){
+                signchart.place.trigger('add', {func: newfunc, roots: rootlist});
+                signchart.toolbar.find('.pssc_newfunc').mathquill('latex','').focus();
+                signchart.toolbar.find('.pssc_newroot1').mathquill('latex','');
+                signchart.toolbar.find('.pssc_newroot2').mathquill('latex','');
+            }
+        });
+
+        signchart.place.find('td.pssc_func')
+            .prepend('<a href="javascript:;" class="pssc_removerow_button pssc_bggrad"><span></span></a>')
+            .find('a.pssc_removerow_button')
+            .click(function(){
+                var $thisbutton = $(this);
+                var $thisfunc = $thisbutton.parents('td.pssc_func');
+                var $allfunc = $thisfunc.parents('tbody').find('td.pssc_func');
+                var index = $allfunc.index($thisfunc);
+                signchart.removeFunc(index);
+                signchart.place.find('.pssc_toolbar a.removerow.isopen').click().click();
+                if (signchart.rows.length === 0){
+                    signchart.place.find('tbody.pssc_intervals tr').remove();
+                }
+            });
+    }
+
     Pssignchart.prototype.isInRoots = function(root){
         result = false;
         for (var i = 0; i < this.roots.length; i++){
@@ -537,7 +624,7 @@ testilogit = {};
     
     Pssignchart.prototype.setInterval = function(n, onoff){
         onoff = (onoff ? 'inside':'');
-        if (n < 0 || n > this.roots.length -1){
+        if (n < 0 || n > this.roots.length){
             return false;
         }
         this.intervals[n] = onoff;
@@ -694,17 +781,18 @@ testilogit = {};
                 +'background: -ms-linear-gradient(top,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* IE10+ */'
                 +'background: linear-gradient(to bottom,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* W3C */'
                 +'filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#feffe8", endColorstr="#d6dbbf",GradientType=0 ); /* IE6-9 */}'
-            +'.pssignchart .pssc_tablewrapper {clear: both;}'
-            +'.pssc_default table.pssc_table {border-collapse: collapse; margin: 0.2em auto; border: none;}'
+            +'.pssignchart .pssc_tablewrapper {clear: both; text-align: center; display: block;}'
+            +'.pssignchart a:hover {background-color: transparent;}'
+            +'.pssc_default table.pssc_table {border-collapse: collapse; margin: 0.8em auto; border: none; display: inline-block; text-align: left;}'
             +'.pssignchartwrapper {text-align: center;}'
-            +'.pssignchart {position: relative; display: inline-block; text-align: left; min-height: 70px;}'
-            +'.pssignchart.editmode {margin-bottom: 2em; padding-left: 70px;}'
+            +'.pssignchart {position: relative; display: inline-block; text-align: left; min-height: 70px; padding: 0.5em;}'
+            +'.pssignchart.editmode {margin-bottom: 2em;}'
             +'.pssc_default table.pssc_table tbody.pssc_body {border: 1px solid black;}'
             +'table.pssc_table tr:nth-child(even) td {background-color: #eef;/*#dfb;*/}'
             +'table.pssc_table tr:nth-child(odd) td {background-color: white;}'
             +'table.pssc_table tr.pssc_total {border-top: 4px solid black;}'
-            +'.pssc_tablewrapper {margin: 0 auto; position: relative; display: inline-block; text-align: left;}'
-            +'table.pssc_table .pssc_head td {color: black; padding-top: 0.7em;}'
+            +'.pssc_tablewrapper {margin: 0 auto; position: relative;}'
+            +'table.pssc_table .pssc_head tr td {color: black; background-color: transparent; padding-top: 0.7em;}'
             +'table.pssc_table .pssc_head td div {min-height: 1em;}'
             +'td.pssc_headrootlabel {text-align: right;}'
             +'td.pssc_headrootlabel .pssc_rootlabel {text-align: left; display: inline-block;}'
@@ -716,6 +804,7 @@ testilogit = {};
             +'table.pssc_table .pssc_body td.pssc_motivation {padding: 0 1em; border-right: 1px solid black; cursor: pointer; padding: 0;}'
             +'table.pssc_table .pssc_body td.pssc_motivation a span {width: 30px; height: 20px; display: block; margin: 0 auto;}'
             +'table.pssc_table .pssc_body td.pssc_motivation a {text-align: center; display: block; border: 1px solid #777; border-radius: 4px; margin: 0;}'
+            +'table.pssc_table .pssc_body td.pssc_motivation a.motshow {margin: 3px;}'
             +'.pssc_default, table.pssc_table td.pssc_motivation a, .pssignchart .pssc_toolbar li a, .pssignchart .pssc_addfuncbutton, .pssc_bggrad  {'
                 +'background: rgb(255,255,255); /* Old browsers */'
                 +'background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%); /* FF3.6+ */'
@@ -784,25 +873,31 @@ testilogit = {};
             +'.pssignchart ul.pssc_toolbar li a.isopen {border-color: red;}'
             +'.pssignchart a.addrow span {display: block; height: 20px; width: 20px; background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAJOgAACToB8GSSSgAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAFgSURBVDiNzVQxSMNAFH3/0rRm6yjiUlwCHcRN54Kbgzi4BFSos3RxtNTRpTgrqJBVHNwEZ93EoZBFXEQcC0Vi7pr7DpWmSe1VSwUf3HL337v//juOmBnThJiq2l8I5sYVHF0sVphjDwCILH9/6/HWVE+mGTbOl4qWVK8AO1/lYZy35+rbD+1RHLPlTuQqGTtKavRW7KATuSaK0bJSgEbagQAZexiyXGuUisLJuQAgYpSZ6DRDqGoLLQDQYTdo1p/bmfNEcO9woQLQNQDH2EaCEOC144OnflApy1LCo34AP4LDgAfge0El9ZgJDSP7RlKC3Uj7INrEbywz+4MbQ6Hs1EpFFSkXAJioDE6HAuIqMbcAwC7YwVnTEEoWG7vzy4JxN7inCSuXJy/3ozjmdxgCQqQv1No8ZaOg9W4HsvARIplpmI9mAhPHaBkAVtdnKxDs9doj/+bqbfLPYRL8/w/2E7FJjqbuDTz5AAAAAElFTkSuQmCC) center center no-repeat;}'
             +'.pssignchart a.removerow span {display: block; height: 20px; width: 20px; background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAJOgAACToB8GSSSgAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACOSURBVDiN7ZMhDsJQEETfNBhsD1GB4wzVSILp8eoq0ZwBV9FD4ADHYBC/TUt+0y8qOnKy+7Kb2ZVtUipLStuA6wTuhkYr5YIiptnQHexH6Cm8w7tUAldgHznQGzgd7dvohC+oZsD41VbAJHCxesAn1IILM1Y21KGh4S83Uv6JDCWD7vwvlBRa/2FvwOX6AlldJihgfCAkAAAAAElFTkSuQmCC) center center no-repeat;}'
-            +'.pssignchart .pssc_toolbarwrapper .pssc_addrowbox {position: absolute; border: 1px solid black; border-radius: 0.5em; box-shadow: 4px 4px 4px rgba(0,0,0,0.5); padding: 0.5em; z-index: 10; background-color: #fefefe; margin-bottom: 0; margin-left: -10px; white-space: nowrap;}'
+            +'.pssignchart .pssc_toolbarwrapper .pssc_addrowbox {position: relative; border: none; border-radius: 0.5em; box-shadow: 0 0 3px black; padding: 0.5em; z-index: 10; background-color: #fefefe; margin-bottom: 0; white-space: nowrap;}'
             +'.pssignchart .pssc_newfunc_title {font-style: italic; margin-left: 1em;}'
             +'.pssignchart .pssc_newroots_title {display: inline-block; width: 1.5em; height: 1.5em; border: 1px solid #777; border-radius: 4px; text-align: center; text-decoration: none; font-weight: bold; color: black;}'
             +'.pssignchart .pssc_toolbarwrapper .pssc_newfunc {display: inline-block; min-width: 5em; min-height: 1.3em; margin: 0 1em; vertical-align: bottom;}'
-            +'.pssignchart .pssc_toolbarwrapper .pssc_newroots, .pssignchart .pssc_toolbarwrapper .pssc_newroot1, .pssignchart .pssc_toolbarwrapper .pssc_newroot2 {display: inline-block; min-width: 4em; min-height: 1.3em; margin: 0 0.5em;}'
-            +'.pssignchart .pssc_toolbarwrapper .pssc_newroots[roots="0"] .pssc_newroot1, .pssignchart .pssc_toolbarwrapper .pssc_newroots[roots="0"] .pssc_newroot2, .pssignchart .pssc_toolbarwrapper .pssc_newroots[roots="1"] .pssc_newroot2 {display: none;}'
-            +'.pssignchart .pssc_addfuncbutton {border: 1px solid #777; border-radius: 4px; text-decoration: none; font-weight: bold; display: inline-block; text-align: center; width: 1.5em; height: 1.5em; padding: 0; margin: 0.2em; vertical-align: top;}'
+            +'.pssignchart .pssc_toolbarwrapper .pssc_newroots, .pssignchart .pssc_toolbarwrapper .pssc_newroot1, .pssignchart .pssc_toolbarwrapper .pssc_newroot2 {display: inline-block; visibility: visible; min-width: 4em; min-height: 1.3em; margin: 0 0.5em;}'
+            +'.pssignchart .pssc_toolbarwrapper .pssc_newroots[roots="0"] .pssc_newroot1, .pssignchart .pssc_toolbarwrapper .pssc_newroots[roots="0"] .pssc_newroot2, .pssignchart .pssc_toolbarwrapper .pssc_newroots[roots="1"] .pssc_newroot2 {visibility: hidden;}'
+            +'.pssignchart .pssc_addfuncbutton {border: 1px solid #777; border-radius: 4px; text-decoration: none; font-weight: bold; display: inline-block; text-align: center; width: 1.5em; height: 1.5em; min-width: 20px; min-height: 20px; padding: 0; margin: 0.2em; vertical-align: top;}'
             +'.pssignchart span.mathquill-editable.inputerror {background-color: #faa;}'
             +'.pssignchart span.mathquill-editable {background-color: white;}'
             +'.pssignchart .pssc_totalwrapper {position: relative;}'
             +'.pssc_totalwrapper .pssc_totalundefined {position: absolute; left: 47px; top: -2em; width: 9px; height: 3em; background-color: transparent;}'
-            +'.pssc_totalwrapper .pssc_totalundefined:hover {background-color: rgba(255,255,255,0.8);}'
-            +'.pssc_totalwrapper .pssc_totalundefined.isundefined {background: rgba(255,255,255,0.5) url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAGCAYAAAARx7TFAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAEJwAABCcB2U8dgAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABESURBVAiZjc6xDYBADAPAC12moqb9ghlZg2kYIzSP9AVFLFkubNmOqrIiIhIHTuy4zVBi4MIzdSC/kl9j5aaDzlx0jr/6Nimp6cXzJwAAAABJRU5ErkJggg==) center top repeat-y;}'
-            +'a.pssc_removerow_button {display: block; width: 15px; height: 15px; margin-left: -40px; border: 1px solid #777; border-radius: 4px; position: absolute;}'
-            +'a.pssc_removerow_button span {display: block; width: 15px; height: 15px; background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAG7AAABuwBHnU4NQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACASURBVCiR1ZIxDoJQEETfEDgB8Q7W9DRWtp6U1oqGnpo7EBssf8JYKAkEUfOtmG6SeZndzco2sUqiyf3C6dx0Uh7gsBXOoD/at8lrunYrnQzXZ2ZTQXAu7HrRPED5BXyVUwJL+A6NIfzQ3KzGBqikfPywcwL95d3OMdrpk/wFPwCoMCa9FLMcVQAAAABJRU5ErkJggg==) center center no-repeat;}'
-        +'.pssc_inequality {margin-bottom: -1em;}'
-        +'a.pssc_ineqlink {color: black; text-decoration: none; display: inline-block;}'
-        +'a.pssc_ineqlink .pssc_ineq {cursor: pointer;}'
-        +'.pssignchart.editmode .pssc_ineqrelation {color: red; font-weight: bold;}'
+            +'.pssc_totalwrapper .pssc_totalundefined:hover {background-color: rgba(255,255,0,0.8);}'
+            +'.pssc_totalwrapper .pssc_totalundefined.isundefined {background: rgba(255,255,0,0.5) url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAGCAYAAAARx7TFAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAEJwAABCcB2U8dgAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABESURBVAiZjc6xDYBADAPAC12moqb9ghlZg2kYIzSP9AVFLFkubNmOqrIiIhIHTuy4zVBi4MIzdSC/kl9j5aaDzlx0jr/6Nimp6cXzJwAAAABJRU5ErkJggg==) center top repeat-y;}'
+            +'a.pssc_removerow_button {display: block; width: 15px; height: 15px; margin-left: -40px; border: 1px solid #777; border-radius: 4px; position: absolute; opacity: 0.7; border: none; }'
+            +'a.pssc_removerow_button:hover {opacity: 1; border: 1px solid #777; margin-left: -41px; margin-top: -1px;}'
+            +'a.pssc_removerow_button span.pssc_icon {display: block; width: 15px; height: 15px; background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAG7AAABuwBHnU4NQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAFISURBVCiRhZO9ahtBFIW/c/cnCG8Q2IIQEUiTIo1rPYDwc7j3K9ilH8RNHiFlSJE3CCE4kCIhkBQmqwXbzWLNcSFZaFdiPTAw93IO37nDjGyzb/3JsrMSyhyqo+Xycp8m3y6+SecvIl5mQCnNJX2SPb8tiqqMIAPytr3AftgxAz9JaRSAs+w62RiukbCNVppN1I5ZcGrp0KvzZmODBBEt9tWTPnrkd0hfBRPsGfYHYCY4xv4IvN8W9821Uvpt+AUQWfYFwNKNI37YXgyZF444AO46XbuRPRY0g2SgknTf6ze2x8AwWXDgPhkaRTxrrg2VoEuWVmRpMPYCe4csuxGMBy9MsDBUSqlDTuuZQ+qY+y+s3juztCKn9ExseK2INwBeLmfr2K+At/TI2v5V36Uqh5MCpnnEtJQmuVQX0t9C+jdq28/Y/5/0jzvgjtI+Y4wZAAAAAElFTkSuQmCC) center center no-repeat;}'
+            +'.pssignchart .pssc_addrowbox a.pssc_addfuncbutton span.pssc_icon {display: block; width: 1.5em; height: 1.5em; min-width: 20px; min-height: 20px; background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAJOgAACToB8GSSSgAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAFgSURBVDiNzVQxSMNAFH3/0rRm6yjiUlwCHcRN54Kbgzi4BFSos3RxtNTRpTgrqJBVHNwEZ93EoZBFXEQcC0Vi7pr7DpWmSe1VSwUf3HL337v//juOmBnThJiq2l8I5sYVHF0sVphjDwCILH9/6/HWVE+mGTbOl4qWVK8AO1/lYZy35+rbD+1RHLPlTuQqGTtKavRW7KATuSaK0bJSgEbagQAZexiyXGuUisLJuQAgYpSZ6DRDqGoLLQDQYTdo1p/bmfNEcO9woQLQNQDH2EaCEOC144OnflApy1LCo34AP4LDgAfge0El9ZgJDSP7RlKC3Uj7INrEbywz+4MbQ6Hs1EpFFSkXAJioDE6HAuIqMbcAwC7YwVnTEEoWG7vzy4JxN7inCSuXJy/3ozjmdxgCQqQv1No8ZaOg9W4HsvARIplpmI9mAhPHaBkAVtdnKxDs9doj/+bqbfLPYRL8/w/2E7FJjqbuDTz5AAAAAElFTkSuQmCC) center center no-repeat;}'
+            +'.pssc_inequality {margin-bottom: -1em;}'
+            +'a.pssc_ineqlink {color: black; text-decoration: none; display: inline-block;}'
+            +'a.pssc_ineqlink .pssc_ineq {cursor: pointer;}'
+            +'.pssignchart.editmode .pssc_ineqrelation {color: red; font-weight: bold;}'
+            +'.pssignchart .pssc_removerow_button {display: none;}'
+            +'.pssignchart.editmode .pssc_removerow_button {display: inline-block;}'
+            +'.pssignchart a .pssc_text {display: none;}'
+            +'.pssignchart a .pssc_icon {display: inline-block;;}'
     }
     
 
