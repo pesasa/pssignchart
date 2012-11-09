@@ -314,97 +314,8 @@ testilogit = {};
         });
     }
     
-    Pssignchart.prototype.showEditOld = function(){
-        // Shows buttons for adding and removing functions.
-        var signchart = this;
-        this.place.prepend('<div class="pssc_toolbarwrapper"><ul class="pssc_toolbar"><li><a href="javascript:;" class="addrow"><span></span></a></li><li><a href="javascript:;" class="removerow"><span></span></a></li></ul></div>');
-        this.toolbar = this.place.find('.pssc_toolbarwrapper');
-        this.toolbar.find('a.addrow').click(function(){
-            var $tool = $(this);
-            if ($tool.hasClass('isopen')){
-                $tool.removeClass('isopen');
-                signchart.toolbar.find('.pssc_addrowbox').fadeOut(300, function(){$(this).remove();});
-            } else {
-                $tool.parents('ul').eq(0).find('a.isopen').click();
-                $tool.addClass('isopen');
-                signchart.toolbar.append('<div class="pssc_addrowbox pssc_bggrad">'
-                    +'<span class="pssc_newfunc_title">f:</span><span class="mathquill-editable pssc_newfunc"></span>'
-                    +'<div class="pssc_newroots" roots="0"><a href="javascript:;" class="pssc_newroots_title pssc_bggrad">0</a><span class="mathquill-editable pssc_newroot1"></span><span class="mathquill-editable pssc_newroot2"></span></div><a href="javascript:;" class="pssc_addfuncbutton"><span class="pssc_text">+</span><span class="pssc_icon"></span></a></div>');
-                signchart.toolbar.find('.pssc_addrowbox').hide().fadeIn(300, function(){$(this).find('.mathquill-editable:not(.mathquill-rendered-math)').mathquill('editable').eq(0).focus();});
-                signchart.toolbar.find('.pssc_addrowbox .pssc_newroots_title').click(function(){
-                    var $newroots = $(this).parents('.pssc_newroots');
-                    var amount = parseInt($newroots.attr('roots'));
-                    amount = (amount + 1) % 3;
-                    $newroots.attr('roots', amount);
-                    $(this).html(amount);
-                });
-                signchart.toolbar.find('.pssc_addrowbox').bind('keyup',function(e){
-                    var key = e.keyCode;
-                    switch (key){
-                        case 27:
-                            $tool.click();
-                            break;
-                        default:
-                            break;
-                    }
-                });
-                signchart.toolbar.find('a.pssc_addfuncbutton').click(function(){
-                    var numofroots = parseInt($(this).parent().find('.pssc_newroots').attr('roots'));
-                    var newfunc = signchart.toolbar.find('.pssc_newfunc').mathquill('latex');
-                    var newroot = [];
-                    var newrootval = [];
-                    var rootsok = true;
-                    var rootlist = [];
-                    for (var i = 0; i < numofroots; i++){
-                        newroot[i] = signchart.toolbar.find('.pssc_newroot'+(i+1)).mathquill('latex');
-                        try {
-                            newrootval[i] = latexeval(newroot[i]);
-                            rootsok = rootsok && (typeof(newrootval[i]) === 'number');
-                            rootlist.push({label: newroot[i], value: newrootval[i]});
-                        } catch (err){
-                            if (err === 'Invalidexpression'){
-                                signchart.toolbar.find('.pssc_newroot'+(i+1)).addClass('inputerror').focus().delay(2000).queue(function(){$(this).removeClass('inputerror');$(this).dequeue();});
-                                rootsok = false;
-                            }
-                        }
-                    }
-                    if (rootsok){
-                        signchart.place.trigger('add', {func: newfunc, roots: rootlist});
-                        signchart.toolbar.find('.pssc_newfunc').mathquill('latex','').focus();
-                        signchart.toolbar.find('.pssc_newroot1').mathquill('latex','');
-                        signchart.toolbar.find('.pssc_newroot2').mathquill('latex','');
-                    }
-                });
-            }
-        });
-        this.toolbar.find('a.removerow').click(function(){
-            var $tool = $(this);
-            if ($tool.hasClass('isopen')){
-                $tool.removeClass('isopen');
-                signchart.place.find('td.pssc_func a.pssc_removerow_button').remove();
-            } else {
-                $tool.parents('ul').eq(0).find('a.isopen').click();
-                $tool.addClass('isopen');
-                signchart.place.find('td.pssc_func')
-                    .prepend('<a href="javascript:;" class="pssc_removerow_button pssc_bggrad"><span></span></a>')
-                    .find('a.pssc_removerow_button')
-                    .click(function(){
-                        var $thisbutton = $(this);
-                        var $thisfunc = $thisbutton.parents('td.pssc_func');
-                        var $allfunc = $thisfunc.parents('tbody').find('td.pssc_func');
-                        var index = $allfunc.index($thisfunc);
-                        signchart.removeFunc(index);
-                        signchart.place.find('.pssc_toolbar a.removerow.isopen').click().click();
-                        if (signchart.rows.length === 0){
-                            signchart.place.find('tbody.pssc_intervals tr').remove();
-                        }
-                    });
-            }
-        });
-    }
-
     Pssignchart.prototype.showEdit = function(){
-        // Shows buttons for adding and removing functions.
+        // Init actions for adding and removing functions.
         var signchart = this;
         this.place.prepend('<div class="pssc_toolbarwrapper"></div>');
         this.toolbar = this.place.find('.pssc_toolbarwrapper');
@@ -524,6 +435,14 @@ testilogit = {};
                 this.roots.push(root);
             };
         }
+        for (var i = 0; i < this.roots.length; i++){
+            this.undefinedpoint[i] = false;
+            this.rootpoints[i] = '';
+            this.intervals[i] = '';
+            this.total.signs[i] = '';
+        }
+        this.intervals[this.roots.length] = '';
+        this.total.signs[this.roots.length] = '';
         var row = new PsscRow(options);
         this.rows.push(row);
         this.roots.sort(function(a,b){return (a.value < b.value ? -1 : 1)});
@@ -538,6 +457,19 @@ testilogit = {};
         // Remove a function.
         this.rows.splice(index, 1);
         this.refreshRoots();
+        // Empty total and intervals
+        this.undefinedpoint = [];
+        this.rootpoints = [];
+        this.intervals = [];
+        this.total.signs = [];
+        for (var i = 0; i < this.roots.length; i++){
+            this.undefinedpoint[i] = false;
+            this.rootpoints[i] = '';
+            this.intervals[i] = '';
+            this.total.signs[i] = '';
+        }
+        this.intervals[this.roots.length] = '';
+        this.total.signs[this.roots.length] = '';
         this.draw();
         this.changed();
     }
@@ -557,7 +489,11 @@ testilogit = {};
     
     Pssignchart.prototype.addTotal = function(options, nodraw){
         options.func = options.func || '';
-        options.signs = options.signs || this.total.signs || [];
+        var emptysigns = [];
+        for (var i = 0; i < this.roots.length; i++){
+            emptysigns.push('');
+        }
+        options.signs = options.signs || this.total.signs || emptysigns;
         options.relation = options.relation || this.total.relation || '\\lt';
         this.total = {func: options.func, signs: options.signs, relation: options.relation};
         if (!nodraw){
@@ -915,6 +851,9 @@ testilogit = {};
         this.roots = options.roots;
         this.motivation = options.motivation;
         this.signs = options.signs;
+        for (var i = 0; i < this.roots.length + 1; i++){
+            this.signs[i] = this.signs[i] || '';
+        }
         this.roots.sort(function(a,b){return (a.value < b.value ? -1 : 1)});
     }
     
