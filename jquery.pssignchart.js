@@ -122,6 +122,7 @@ testilogit = {};
             // Draw the total row.
             var $trow = $('<tr class="pssc_total"></tr>');
             $trow.append('<td colspan="2" class="pssc_total"><span class="mathquill">'+this.total.func+'</span></td>');
+            for (var j = 0; j < this.roots.length; j++){
                 var thisundefined = (this.undefinedpoint[j] ? ' isundefined': '');
                 if (this.mode === 'edit') {
                     $trow.append('<td class="pssc_sign" sign="'+this.getTotalSign(j)+'" rootnum="'+j+'"><div class="pssc_totalwrapper"><a href="javascript:;" class="pssc_totalsign"></a><a href="javascript:;" class="pssc_totalundefined'+thisundefined+'"></a></div></td>');
@@ -221,31 +222,11 @@ testilogit = {};
             if (this.rows[i].isRoot(this.roots[j])){
                 $tdata.addClass('pssc_isroot');
                 rowroot++;
+            }
             $trow.append($tdata);
-            }
+        }
         $trow.append('<td class="pssc_sign" sign="'+this.getSign(i, rowroot)+'" rootnum="'+rowroot+'"><a href="javascript:;"></a></td>');
-
-            $tbody.append($trow);
-            this.place.find('.mathquill:not(.mathquill-rendered-math)').mathquill();
-        }
-
-        if (this.rows.length > 0){
-            // Add intervals
-            var lefthandside = (this.rows.length === 1 ? this.rows[0].func : this.total.func);
-            var intervalhtml = '<td colspan="2"><div class="pssc_inequality"><a href="javascript:;" class="pssc_ineqlink"><span class="pssc_ineq">'+ lefthandside + this.getTotalRelation() +'0</span></a></div></td>';
-            }
-            intervalhtml += '<td class="pssc_interval"><span><a href="javascript:;" class="pssc_intervalline" intervaltype="'
-                +this.getInterval(this.roots.length)+'"></a></span></td>';
-            this.place.find('table.pssc_table tbody.pssc_intervals tr').html(intervalhtml)
-                .find('.pssc_ineq').mathquill('embedded-latex');
-            this.place.find('.pssc_ineq > span.binary-operator').last().addClass('pssc_ineqrelation');
-        }
-
-        // Add labels for roots.
-        $thead.empty().append('<tr><td colspan="2"><div></div></td></tr>');
-        $thtr = $thead.find('tr');
-        for (var i = 0; i < this.roots.length; i++){
-            $thtr.append('<td class="pssc_headrootlabel"><div class="pssc_rootlabel"><span class="mathquill">'+this.roots[i].label+'</span></div></td>');
+        $tbody.append($trow);
     }
     
     Pssignchart.prototype.initEdit = function(){
@@ -560,33 +541,6 @@ testilogit = {};
         this.intervals[this.roots.length] = '';
         this.total.signs[this.roots.length] = '';
         this.draw();
-        this.changed();
-    }
-    
-    Pssignchart.prototype.refreshRoots = function(){
-        // Rebuild roots-list.
-        this.roots = [];
-        for (var i = 0; i < this.rows.length; i++){
-            for (var j = 0; j < this.rows[i].roots.length; j++){
-                if (!this.isInRoots(this.rows[i].roots[j])){
-                    this.roots.push(this.rows[i].roots[j]);
-                }
-            }
-        }
-        this.roots.sort(function(a,b){return (a.value < b.value ? -1 : 1)});
-    }
-    
-    Pssignchart.prototype.addTotal = function(options, nodraw){
-        options.func = options.func || '';
-        var emptysigns = [];
-        for (var i = 0; i < this.roots.length; i++){
-            emptysigns.push('');
-        }
-        options.signs = options.signs || this.total.signs || emptysigns;
-        options.relation = options.relation || this.total.relation || '\\lt';
-        this.total = {func: options.func, signs: options.signs, relation: options.relation};
-        if (!nodraw){
-            this.draw();
         this.changed();
     }
     
