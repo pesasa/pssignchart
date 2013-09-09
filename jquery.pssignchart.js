@@ -43,7 +43,7 @@ testilogit = {};
         return this.each(function(){
             // Create new Pssignchart object.
             var signchart = new Pssignchart(this, settings);
-            testilogit.signchart = signchart;
+            //testilogit.signchart = signchart;
             // Init the signchart
             signchart.init();
         });
@@ -684,7 +684,7 @@ testilogit = {};
     
     Pssignchart.prototype.setData = function(options){
         this.empty();
-        this.caption = options.caption;
+        this.caption = options.caption || '';
         for (var i = 0; i < options.rows.length; i++){
             this.addFunc(options.rows[i], true);
         }
@@ -702,6 +702,7 @@ testilogit = {};
         this.total = {func: '', signs: ['']};
         this.intervals = [];
         this.rootpoints = [];
+        this.caption = '';
         this.draw();
         this.changed();
     }
